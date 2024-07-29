@@ -1,7 +1,13 @@
+'''
+Created Date: Friday, July 26th 2024, 12:08:09 am
+Author: Kintu Declan Trevor
+
+Copyright (c) 2024 Kintu Declan Trevor
+'''
+
 from django.contrib import admin
-from main.models import Customer, Marketer, Product
+from .models import Product, Subscribe
 
 
-admin.site.register(Customer)
-admin.site.register(Marketer)
 admin.site.register(Product)
+admin.site.register(Subscribe)
