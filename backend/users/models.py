@@ -24,8 +24,8 @@ def rename_image(instance, filename):
     return new_path
 
 
-# Customer model
-class Customer(models.Model):
+# User Information model
+class UserInfo(models.Model):
     title_choices = (
         ("Mr", "Mr"),
         ("Mrs", "Mrs"),
@@ -38,37 +38,34 @@ class Customer(models.Model):
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-    title = models.CharField(max_length=100, choices=title_choices, null=True)
+    title = models.CharField(max_length=10, choices=title_choices, null=True)
     gender = models.CharField(max_length=10, choices=gender_choices, null=True)
     d_o_b = models.DateField(null=True)
-    phone = models.CharField(max_length=100, null=True)
-    profile_image = models.ImageField(upload_to=rename_image, null=True)
-    subscribed = models.BooleanField(default=False)
+    phone = models.PositiveBigIntegerField(null=True, unique=True)
+    is_customer = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
 
     def __str__(self):
         return self.phone
+
+
+# Customer model
+class Customer(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    customer_id = models.CharField(max_length=10, null=True, unique=True)
+    subscribed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.customer_id
 
 
 # Marketer model
 class Marketer(models.Model):
-    title_choices = (
-        ("Mr", "Mr"),
-        ("Mrs", "Mrs"),
-        ("Ms", "Ms"),
-    )
-
-    gender_choices = (
-        ("Male", "Male"),
-        ("Female", "Female"),
-    )
-
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-    title = models.CharField(max_length=100, choices=title_choices, null=True)
-    gender = models.CharField(max_length=10, choices=gender_choices, null=True)
-    d_o_b = models.DateField(null=True)
-    phone = models.CharField(max_length=100, null=True)
+    staff_id = models.CharField(max_length=10, null=True, unique=True)
     profile_image = models.ImageField(upload_to=rename_image, null=True)
     customers = models.ManyToManyField(Customer, blank=True)
+    is_admin = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.phone
+        return self.staff_id
