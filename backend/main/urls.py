@@ -6,17 +6,22 @@ Copyright (c) 2024 Kintu Declan Trevor
 '''
 
 from django.urls import path
-from .views import (ProductList, ProductDetails, MarketerList, MarketerDetails, CustomerList, 
-                    CustomerDetails, SubscribeList, SubscribeDetails)
+from .views import (ProductList, ProductDetails, MarketerList, MarketerDetails, CartList, CartDetails, 
+                    OrderList, OrderDetails, CustomerList, CustomerDetails, SubscribeList, 
+                    SubscribeDetails)
 
 
 urlpatterns = [
-    path("list-products/", ProductList.as_view(), name="List Products"), # type: ignore
-    path("view-product/<str:id>/", ProductDetails.as_view(), name="View Product"),
-    path("list-subscriptions/", SubscribeList.as_view(), name="List Subscriptions"), # type: ignore
-    path("view-subscription/<str:id>/", SubscribeDetails.as_view(), name="View Subscription"),
-    path("list-marketers/", MarketerList.as_view(), name="List Marketers"), # type: ignore
-    path("view-marketer/<str:id>/", MarketerDetails.as_view(), name="View Marketer"),
-    path("list-customers/", CustomerList.as_view(), name="List Customer"), # type: ignore
-    path("view-customer/<str:id>/", CustomerDetails.as_view(), name="View Customer"),
+    path("products/", ProductList.as_view(), name="List Products"), # type: ignore
+    path("product/<str:product_id>/", ProductDetails.as_view(), name="View Product"),
+    path("subscriptions/", SubscribeList.as_view(), name="List Subscriptions"), # type: ignore
+    path("subscription/<str:subscribe_id>/", SubscribeDetails.as_view(), name="View Subscription"),
+    path("cart/", CartList.as_view(), name="List Cart"), # type: ignore
+    path("cart/<str:cart_id>/", CartDetails.as_view(), name="View Product"),
+    path("orders/", OrderList.as_view(), name="List Orders"), # type: ignore
+    path("order/<str:order_id>/", OrderDetails.as_view(), name="View Order"),
+    path("marketers/", MarketerList.as_view(), name="List Marketers"), # type: ignore
+    path("marketer/<str:staff_id>/", MarketerDetails.as_view(), name="View Marketer"),
+    path("customers/", CustomerList.as_view(), name="List Customer"), # type: ignore
+    path("customer/<str:customer_id>/", CustomerDetails.as_view(), name="View Customer"),
 ]

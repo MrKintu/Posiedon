@@ -15,12 +15,12 @@ from .models import Customer, Marketer, UserInfo
 
 # Create User Ids
 def new_ID(switch):
-    alphabet = string.ascii_lowercase + string.digits
+    alphabet = string.ascii_uppercase + string.digits
     secure_string = ''.join(secrets.choice(alphabet) for _ in range(6))
     if switch:
-        new_id = f'cus-{secure_string}'
+        new_id = f'CUS-{secure_string}'
     else:
-        new_id = f'stf-{secure_string}'
+        new_id = f'STF-{secure_string}'
 
     return new_id
 

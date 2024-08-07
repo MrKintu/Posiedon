@@ -46,7 +46,7 @@ class UserInfo(models.Model):
     is_staff = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.phone
+        return str(self.phone)
 
 
 # Customer model
