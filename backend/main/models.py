@@ -27,7 +27,7 @@ class Product(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(null=True)
     price = models.FloatField(blank=True)
-    marketers = models.ManyToManyField(Marketer, blank=True)
+    marketers = models.ManyToManyField(Marketer, blank=True, related_name='product_marketers')
     target = models.CharField(max_length=50, choices=target_choices, null=True)
     type = models.CharField(max_length=50, choices=product_types, null=True) # type: ignore
 
@@ -41,19 +41,39 @@ class Subscribe(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(null=True)
     price = models.FloatField(blank=True)
-    customers = models.ManyToManyField(Customer, blank=True)
-    products = models.ManyToManyField(Product, blank=True)
+    products = models.ManyToManyField(Product, blank=True, related_name='subscribe_products')
 
     def __str__(self):
         return self.subscribe_id
 
 
+# Ownership Model
+class Owner(models.Model):
+    owner_id = models.CharField(max_length=10, null=True, unique=True)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True, 
+                                 related_name='owner_customer')
+    products = models.ManyToManyField(Product, blank=True, related_name='owner_products')
+    subscribe = models.ForeignKey(Subscribe, on_delete=models.SET_NULL, null=True, blank=True, 
+                                  related_name='owner_subscribe')
+    start = models.DateTimeField(auto_now_add=True)
+    stop = models.DateTimeField()
+    has_product = models.BooleanField(default=False)
+    has_subscribe = models.BooleanField(default=False)
+    auto_product = models.BooleanField(default=False)
+    auto_subscribe = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.owner_id
+
+
 # Cart Model
 class Cart(models.Model):
     cart_id = models.CharField(max_length=10, null=True, unique=True)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True)
-    subscribe = models.ForeignKey(Subscribe, on_delete=models.SET_NULL, null=True, blank=True)
-    products = models.ManyToManyField(Product, blank=True)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True, 
+                                 related_name='cart_customer')
+    products = models.ManyToManyField(Product, blank=True, related_name='cart_products')
+    subscribe = models.ForeignKey(Subscribe, on_delete=models.SET_NULL, null=True, blank=True, 
+                                  related_name='cart_subscribe')
     total = models.FloatField(blank=True)
 
     def __str__(self):
@@ -63,10 +83,29 @@ class Cart(models.Model):
 # Order Model
 class Order(models.Model):
     order_id = models.CharField(max_length=15, null=True, unique=True)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True)
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True, blank=True)
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True,
+                                 related_name='order_customer')
+    cart = models.ForeignKey(Cart, on_delete=models.SET_NULL, null=True, blank=True, 
+                             related_name='order_cart')
     date = models.DateTimeField(auto_now_add=True)
     amount = models.FloatField(blank=True)
 
     def __str__(self):
         return self.order_id
+
+
+# Customer Review Model
+class Review(models.Model):
+    review_id = models.CharField(max_length=15, null=True, unique=True)
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True,
+                                related_name='review_product')
+    subcribe = models.ForeignKey(Subscribe, on_delete=models.SET_NULL, null=True, blank=True,
+                                 related_name='review_subscribe')
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True,
+                                 related_name='review_customer')
+    rating = models.IntegerField()
+    review = models.TextField()
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.review_id

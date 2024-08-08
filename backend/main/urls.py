@@ -6,9 +6,8 @@ Copyright (c) 2024 Kintu Declan Trevor
 '''
 
 from django.urls import path
-from .views import (ProductList, ProductDetails, MarketerList, MarketerDetails, CartList, CartDetails, 
-                    OrderList, OrderDetails, CustomerList, CustomerDetails, SubscribeList, 
-                    SubscribeDetails)
+from .views import (ProductList, ProductDetails, CartList, CartDetails, OrderList, OrderDetails, 
+                    SubscribeList, SubscribeDetails, ReviewList, ReviewDetails)
 
 
 urlpatterns = [
@@ -20,8 +19,6 @@ urlpatterns = [
     path("cart/<str:cart_id>/", CartDetails.as_view(), name="View Product"),
     path("orders/", OrderList.as_view(), name="List Orders"), # type: ignore
     path("order/<str:order_id>/", OrderDetails.as_view(), name="View Order"),
-    path("marketers/", MarketerList.as_view(), name="List Marketers"), # type: ignore
-    path("marketer/<str:staff_id>/", MarketerDetails.as_view(), name="View Marketer"),
-    path("customers/", CustomerList.as_view(), name="List Customer"), # type: ignore
-    path("customer/<str:customer_id>/", CustomerDetails.as_view(), name="View Customer"),
+    path("reviews/", ReviewList.as_view(), name="List Reviews"), # type: ignore
+    path("review/<str:review_id>/", ReviewDetails.as_view(), name="View Review"),
 ]

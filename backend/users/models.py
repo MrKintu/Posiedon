@@ -37,13 +37,11 @@ class UserInfo(models.Model):
         ("Female", "Female"),
     )
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     title = models.CharField(max_length=10, choices=title_choices, null=True)
     gender = models.CharField(max_length=10, choices=gender_choices, null=True)
     d_o_b = models.DateField(null=True)
     phone = models.PositiveBigIntegerField(null=True, unique=True)
-    is_customer = models.BooleanField(default=False)
-    is_staff = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.phone)
@@ -51,9 +49,29 @@ class UserInfo(models.Model):
 
 # Customer model
 class Customer(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    industry_choices = (
+        (0, "Transportation"),
+        (1, "Pharmaceutical"),
+        (2, "Telecommunications"),
+        (3, "Manufacturing"),
+        (4, "Mining"),
+        (5, "Hospitality"),
+        (6, "Media and News"),
+        (7, "Agriculture"),
+        (8, "Computer and Technology"),
+        (9, "Education"),
+        (10, "Finance and Economics"),
+        (11, "Health Care")
+    )
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     customer_id = models.CharField(max_length=10, null=True, unique=True)
-    subscribed = models.BooleanField(default=False)
+    business = models.CharField(max_length=100, null=True, blank=True)
+    description = models.TextField(null=True)
+    industry = models.CharField(max_length=100, blank=True, null=True, choices=industry_choices) # type: ignore
+    city = models.CharField(max_length=100, null=True, blank=True)
+    state = models.CharField(max_length=100, null=True, blank=True)
+    country = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return self.customer_id
@@ -61,7 +79,7 @@ class Customer(models.Model):
 
 # Marketer model
 class Marketer(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     staff_id = models.CharField(max_length=10, null=True, unique=True)
     profile_image = models.ImageField(upload_to=rename_image, null=True)
     customers = models.ManyToManyField(Customer, blank=True)

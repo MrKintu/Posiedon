@@ -6,18 +6,13 @@ Copyright (c) 2024 Kintu Declan Trevor
 '''
 
 from rest_framework import serializers
-from .models import Product, Subscribe, Cart, Order
-from users.models import Marketer, Customer
+from .models import Product, Subscribe, Cart, Order, Review, Owner
 
 
-class ProductListSerializer(serializers.ModelSerializer):
+class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = "__all__"
-    
-    def __init__(self, *args, **kwargs):
-        super(ProductListSerializer, self).__init__(*args, **kwargs)
-        self.Meta.depth = 1 # type: ignore
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
@@ -30,14 +25,10 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         self.Meta.depth = 1 # type: ignore
 
 
-class SubscribeListSerializer(serializers.ModelSerializer):
+class SubscribeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscribe
         fields = "__all__"
-    
-    def __init__(self, *args, **kwargs):
-        super(SubscribeListSerializer, self).__init__(*args, **kwargs)
-        self.Meta.depth = 1 # type: ignore
 
 
 class SubscribeDetailSerializer(serializers.ModelSerializer):
@@ -50,14 +41,26 @@ class SubscribeDetailSerializer(serializers.ModelSerializer):
         self.Meta.depth = 1 # type: ignore
 
 
-class CartListSerializer(serializers.ModelSerializer):
+class OwnerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Cart
+        model = Owner
+        fields = "__all__"
+
+
+class OwnerDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Owner
         fields = "__all__"
     
     def __init__(self, *args, **kwargs):
-        super(CartListSerializer, self).__init__(*args, **kwargs)
+        super(OwnerDetailSerializer, self).__init__(*args, **kwargs)
         self.Meta.depth = 1 # type: ignore
+
+
+class CartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = "__all__"
 
 
 class CartDetailSerializer(serializers.ModelSerializer):
@@ -70,14 +73,10 @@ class CartDetailSerializer(serializers.ModelSerializer):
         self.Meta.depth = 1 # type: ignore
 
 
-class OrderListSerializer(serializers.ModelSerializer):
+class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = "__all__"
-    
-    def __init__(self, *args, **kwargs):
-        super(OrderListSerializer, self).__init__(*args, **kwargs)
-        self.Meta.depth = 1 # type: ignore
 
 
 class OrderDetailSerializer(serializers.ModelSerializer):
@@ -90,41 +89,17 @@ class OrderDetailSerializer(serializers.ModelSerializer):
         self.Meta.depth = 1 # type: ignore
 
 
-class MarketerListSerializer(serializers.ModelSerializer):
+class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Marketer
+        model = Review
+        fields = "__all__"
+
+
+class ReviewDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
         fields = "__all__"
     
     def __init__(self, *args, **kwargs):
-        super(MarketerListSerializer, self).__init__(*args, **kwargs)
-        self.Meta.depth = 1 # type: ignore
-
-
-class MarketerDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Marketer
-        fields = "__all__"
-    
-    def __init__(self, *args, **kwargs):
-        super(MarketerDetailSerializer, self).__init__(*args, **kwargs)
-        self.Meta.depth = 1 # type: ignore
-
-
-class CustomerListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Customer
-        fields = "__all__"
-    
-    def __init__(self, *args, **kwargs):
-        super(CustomerListSerializer, self).__init__(*args, **kwargs)
-        self.Meta.depth = 1 # type: ignore
-
-
-class CustomerDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Customer
-        fields = "__all__"
-    
-    def __init__(self, *args, **kwargs):
-        super(CustomerDetailSerializer, self).__init__(*args, **kwargs)
+        super(ReviewDetailSerializer, self).__init__(*args, **kwargs)
         self.Meta.depth = 1 # type: ignore

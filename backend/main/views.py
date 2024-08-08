@@ -6,75 +6,86 @@ Copyright (c) 2024 Kintu Declan Trevor
 '''
 
 from rest_framework import generics
-from .serializers import (ProductListSerializer, ProductDetailSerializer, MarketerListSerializer, 
-                          MarketerDetailSerializer, CartListSerializer, CartDetailSerializer, 
-                          OrderListSerializer, OrderDetailSerializer, CustomerListSerializer, 
-                          CustomerDetailSerializer, SubscribeListSerializer, SubscribeDetailSerializer)
-from .models import Product, Subscribe, Cart, Order
-from users.models import Customer, Marketer
+from .serializers import (ProductSerializer, ProductDetailSerializer, CartSerializer, 
+                          CartDetailSerializer, OrderSerializer, OrderDetailSerializer, 
+                          SubscribeSerializer, SubscribeDetailSerializer, ReviewSerializer,
+                          ReviewDetailSerializer, OwnerSerializer, OwnerDetailSerializer)
+from .models import Product, Subscribe, Cart, Order, Review, Owner
 
 
+# Fetch all Products
 class ProductList(generics.ListCreateAPIView):
     queryset = Product.objects.all().order_by('product_id')
-    serializer_class = ProductListSerializer
+    serializer_class = ProductSerializer
 
 
+# Fetch Single Product
 class ProductDetails(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductDetailSerializer
     lookup_field = 'product_id'
 
 
+# Fetch all subscriptions
 class SubscribeList(generics.ListCreateAPIView):
     queryset = Subscribe.objects.all().order_by('subscribe_id')
-    serializer_class = SubscribeListSerializer
+    serializer_class = SubscribeSerializer
 
 
+# Fetch single Subscription
 class SubscribeDetails(generics.RetrieveUpdateDestroyAPIView):
     queryset = Subscribe.objects.all()
     serializer_class = SubscribeDetailSerializer
     lookup_field = 'subscribe_id'
 
 
+# Fetch all Owners
+class OwnerList(generics.ListCreateAPIView):
+    queryset = Owner.objects.all().order_by('owner_id')
+    serializer_class = OwnerSerializer
+
+
+# Fetch Single Owner
+class OwnerDetails(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Owner.objects.all()
+    serializer_class = OwnerDetailSerializer
+    lookup_field = 'owner_id'
+
+
+# Fetch all Carts
 class CartList(generics.ListCreateAPIView):
     queryset = Cart.objects.all().order_by('cart_id')
-    serializer_class = CartListSerializer
+    serializer_class = CartSerializer
 
 
+# Fetch Single Cart
 class CartDetails(generics.RetrieveUpdateDestroyAPIView):
     queryset = Cart.objects.all()
     serializer_class = CartDetailSerializer
     lookup_field = 'cart_id'
 
 
+# Fetch All Orders
 class OrderList(generics.ListCreateAPIView):
     queryset = Order.objects.all().order_by('order_id')
-    serializer_class = OrderListSerializer
+    serializer_class = OrderSerializer
 
 
+# Fetch Single Order
 class OrderDetails(generics.RetrieveUpdateDestroyAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderDetailSerializer
     lookup_field = 'order_id'
 
 
-class CustomerList(generics.ListCreateAPIView):
-    queryset = Customer.objects.all().order_by('customer_id')
-    serializer_class = CustomerListSerializer
+# Fetch All Reviews
+class ReviewList(generics.ListCreateAPIView):
+    queryset = Review.objects.all().order_by('review_id')
+    serializer_class = ReviewSerializer
 
 
-class CustomerDetails(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Customer.objects.all()
-    serializer_class = CustomerDetailSerializer
-    lookup_field = 'customer_id'
-
-
-class MarketerList(generics.ListCreateAPIView):
-    queryset = Marketer.objects.all().order_by('staff_id')
-    serializer_class = MarketerListSerializer
-
-
-class MarketerDetails(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Marketer.objects.all()
-    serializer_class = MarketerDetailSerializer
-    lookup_field = 'staff_id'
+# Fetch Single Review
+class ReviewDetails(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewDetailSerializer
+    lookup_field = 'review_id'
