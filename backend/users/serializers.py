@@ -9,6 +9,7 @@ import secrets
 import string
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 from django.forms.models import model_to_dict
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -43,11 +44,17 @@ class UserInfoDetailSerializer(serializers.ModelSerializer):
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
-        fields = ['customer_id', 'business', 'description', 'industry', 'city',
-                  'state', 'country']
+        fields = ['customer_id', 'business', 'description', 'industry', 'city', 'state', 
+                  'country']
 
 
 class CustomerDetailSerializer(serializers.ModelSerializer):
+    owner_customer = serializers.StringRelatedField(many=True)
+    cart_customer = serializers.StringRelatedField(many=True)
+    order_customer = serializers.StringRelatedField(many=True)
+    review_customer = serializers.StringRelatedField(many=True)
+    marketer_customers = serializers.StringRelatedField(many=True)
+
     class Meta:
         model = Customer
         fields = "__all__"
@@ -64,6 +71,8 @@ class MarketerSerializer(serializers.ModelSerializer):
 
 
 class MarketerDetailSerializer(serializers.ModelSerializer):
+    product_marketers = serializers.StringRelatedField(many=True)
+
     class Meta:
         model = Marketer
         fields = "__all__"
@@ -111,9 +120,20 @@ class UserSerializer(serializers.ModelSerializer):
                 is_admin=marketer_data.get('is_admin')
             )
             if 'customers' in marketer_data:
-                marketer.customers.set(marketer_data['customers'])
+                for single in marketer_data.get('customers'):
+                    customer = get_object_or_404(Customer, customer_id=single)
+                    marketer.customers.set(customer) # type: ignore
         else:
-            Customer.objects.create(user=user, customer_id=user_id, **customer_data)
+            Customer.objects.create(
+                user=user, 
+                customer_id=user_id, 
+                business=customer_data.get('business'),
+                description=customer_data.get('description'),
+                industry=customer_data.get('industry'),
+                city=customer_data.get('city'),
+                state=customer_data.get('state'),
+                country=customer_data.get('country')
+            )
 
         return user
 

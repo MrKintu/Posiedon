@@ -6,11 +6,12 @@ Copyright (c) 2024 Kintu Declan Trevor
 '''
 
 from django.contrib import admin
-from .models import Product, Subscribe, Cart, Order, Review
+from .models import Product, Subscribe, Cart, Order, Review, Owner
 
 
 admin.site.register(Cart)
 admin.site.register(Order)
+admin.site.register(Owner)
 admin.site.register(Product)
 admin.site.register(Review)
 admin.site.register(Subscribe)

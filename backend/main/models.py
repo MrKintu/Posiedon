@@ -23,7 +23,7 @@ class Product(models.Model):
         (4, "E-Commerce Solutions")
     )
 
-    product_id = models.CharField(max_length=10, null=True, unique=True)
+    product_id = models.CharField(max_length=10, null=True, blank=True, unique=True)
     title = models.CharField(max_length=200)
     description = models.TextField(null=True)
     price = models.FloatField(blank=True)
@@ -37,7 +37,7 @@ class Product(models.Model):
 
 # Subscription Model
 class Subscribe(models.Model):
-    subscribe_id = models.CharField(max_length=15, null=True, unique=True)
+    subscribe_id = models.CharField(max_length=15, null=True, blank=True, unique=True)
     title = models.CharField(max_length=200)
     description = models.TextField(null=True)
     price = models.FloatField(blank=True)
@@ -49,7 +49,7 @@ class Subscribe(models.Model):
 
 # Ownership Model
 class Owner(models.Model):
-    owner_id = models.CharField(max_length=10, null=True, unique=True)
+    owner_id = models.CharField(max_length=10, null=True, blank=True, unique=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True, 
                                  related_name='owner_customer')
     products = models.ManyToManyField(Product, blank=True, related_name='owner_products')
@@ -68,7 +68,7 @@ class Owner(models.Model):
 
 # Cart Model
 class Cart(models.Model):
-    cart_id = models.CharField(max_length=10, null=True, unique=True)
+    cart_id = models.CharField(max_length=10, null=True, blank=True, unique=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True, 
                                  related_name='cart_customer')
     products = models.ManyToManyField(Product, blank=True, related_name='cart_products')
@@ -82,7 +82,7 @@ class Cart(models.Model):
 
 # Order Model
 class Order(models.Model):
-    order_id = models.CharField(max_length=15, null=True, unique=True)
+    order_id = models.CharField(max_length=15, null=True, blank=True, unique=True)
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True,
                                  related_name='order_customer')
     cart = models.ForeignKey(Cart, on_delete=models.SET_NULL, null=True, blank=True, 
@@ -96,7 +96,7 @@ class Order(models.Model):
 
 # Customer Review Model
 class Review(models.Model):
-    review_id = models.CharField(max_length=15, null=True, unique=True)
+    review_id = models.CharField(max_length=15, null=True, blank=True, unique=True)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True,
                                 related_name='review_product')
     subcribe = models.ForeignKey(Subscribe, on_delete=models.SET_NULL, null=True, blank=True,

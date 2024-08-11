@@ -65,7 +65,7 @@ class Customer(models.Model):
     )
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
-    customer_id = models.CharField(max_length=10, null=True, unique=True)
+    customer_id = models.CharField(max_length=10, null=True, blank=True, unique=True)
     business = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True)
     industry = models.CharField(max_length=100, blank=True, null=True, choices=industry_choices) # type: ignore
@@ -80,9 +80,9 @@ class Customer(models.Model):
 # Marketer model
 class Marketer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
-    staff_id = models.CharField(max_length=10, null=True, unique=True)
+    staff_id = models.CharField(max_length=10, null=True, blank=True, unique=True)
     profile_image = models.ImageField(upload_to=rename_image, null=True)
-    customers = models.ManyToManyField(Customer, blank=True)
+    customers = models.ManyToManyField(Customer, blank=True, related_name='marketer_customers')
     is_admin = models.BooleanField(default=False)
 
     def __str__(self):
