@@ -1,37 +1,37 @@
 "use client";
+import "./globals.css";
+import { Open_Sans } from "next/font/google";
+import { Navbar, Sidebar, ThemeWindow } from "@/components";
+import { ContextProvider } from "@/contexts/ContextProvider";
+import { ReactNode } from "react";
 
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
-import ScrollToTop from "@/components/ScrollToTop";
-import { Inter } from "next/font/google";
-import "node_modules/react-modal-video/css/modal-video.css";
-import "../styles/index.css";
+const open = Open_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  style: "normal",
+  display: "swap",
+  variable: "--font-open",
+});
 
-const inter = Inter({ subsets: ["latin"] });
+interface RootLayoutProps {
+  children: ReactNode;
+}
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html suppressHydrationWarning lang="en">
-      {/*
-        <head /> will contain the components returned by the nearest parent
-        head.js. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
-      */}
-      <head />
-
-      <body className={`bg-[#FCFCFC] dark:bg-black ${inter.className}`}>
-        <Providers>
-          <Header />
-          {children}
-          <Footer />
-          <ScrollToTop />
-        </Providers>
+    <html lang="en" className={`${open.variable}`} id="base-html">
+      <body className={open.className}>
+        <ContextProvider>
+          <main className="flex relative dark:bg-main-dark-bg">
+            <ThemeWindow />
+            <Sidebar />
+            <div className="min-h-screen dark:bg-main-dark-bg bg-main-bg w-full">
+              <Navbar />
+              <div className="md:mt-4 mt-16">{children}</div>
+            </div>
+          </main>
+        </ContextProvider>
       </body>
     </html>
   );
 }
-
-import { Providers } from "./providers";

@@ -5,36 +5,29 @@ module.exports = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/**/*.{js,ts,jsx,tsx,mdx}",
+    "./public/data/*.{js,ts,jsx,tsx,mdx}",
   ],
-  darkMode: "class",
+  mode: "jit", // Keep JIT mode if you prefer it
+  darkMode: "class", // Same in both files
   theme: {
     container: {
       center: true,
       padding: "1rem",
     },
-
     screens: {
       xs: "450px",
-      // => @media (min-width: 450px) { ... }
-
       sm: "575px",
-      // => @media (min-width: 576px) { ... }
-
       md: "768px",
-      // => @media (min-width: 768px) { ... }
-
       lg: "992px",
-      // => @media (min-width: 992px) { ... }
-
       xl: "1200px",
-      // => @media (min-width: 1200px) { ... }
-
       "2xl": "1400px",
-      // => @media (min-width: 1400px) { ... }
     },
     extend: {
+      // Merge custom colors
       colors: {
+        exm: "#fff",
+        "theme-button": "#99abb4",
         current: "currentColor",
         transparent: "transparent",
         white: "#FFFFFF",
@@ -56,8 +49,45 @@ module.exports = {
           dark: "#1E232E",
           light: "#F0F2F9",
         },
+        "main-bg": "#FAFBFB",
+        "main-dark-bg": "#20232A",
+        "secondary-dark-bg": "#33373E",
+        "light-gray": "#F7F7F7",
+        "half-transparent": "rgba(0, 0, 0, 0.5)",
+        "theme-bg": "#484B52",
       },
-
+      // Merge fontSize, fontFamily, etc.
+      fontSize: {
+        14: "14px",
+      },
+      fontFamily: {
+        open: ["var(--font-open)", "sans-serif"],
+      },
+      borderWidth: {
+        1: "1px",
+      },
+      borderColor: {
+        color: "rgba(0, 0, 0, 0.1)",
+      },
+      width: {
+        400: "400px",
+        760: "760px",
+        780: "780px",
+        800: "800px",
+        1000: "1000px",
+        1200: "1200px",
+        1400: "1400px",
+      },
+      height: {
+        80: "80px",
+      },
+      minHeight: {
+        590: "590px",
+      },
+      backgroundImage: {
+        "hero-pattern": "url('/data/welcome-bg.svg')",
+      },
+      // Merge boxShadow and dropShadow from second file
       boxShadow: {
         signUp: "0px 5px 10px rgba(4, 10, 34, 0.2)",
         one: "0px 2px 3px rgba(7, 7, 77, 0.05)",

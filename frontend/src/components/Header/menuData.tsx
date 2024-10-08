@@ -15,14 +15,14 @@ const menuData: Menu[] = [
   },
   {
     id: 33,
-    title: "Blog",
-    path: "/blog",
+    title: "Products",
+    path: "/products",
     newTab: false,
   },
   {
     id: 3,
-    title: "Support",
-    path: "/contact",
+    title: "Contact",
+    path: "/customer/contact",
     newTab: false,
   },
   {
@@ -44,20 +44,20 @@ const menuData: Menu[] = [
       },
       {
         id: 43,
-        title: "Blog Grid Page",
-        path: "/blog",
+        title: "Products",
+        path: "/customer/products",
         newTab: false,
       },
       {
         id: 44,
         title: "Blog Sidebar Page",
-        path: "/blog-sidebar",
+        path: "/customer/blog-sidebar",
         newTab: false,
       },
       {
         id: 45,
         title: "Blog Details Page",
-        path: "/blog-details",
+        path: "/customer/blog-details",
         newTab: false,
       },
       {
