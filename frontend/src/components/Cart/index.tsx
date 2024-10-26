@@ -1,3 +1,10 @@
+/*
+ * Created Date: Tuesday, October 8th 2024, 1:31:41 am
+ * Author: Kintu Declan Trevor
+ * 
+ * Copyright (c) 2024 Kintu Declan Trevor
+ */
+
 import React from "react";
 import { useStateContext } from "@/contexts/ContextProvider";
 import { AiOutlineMinusSquare, AiOutlinePlusSquare } from "react-icons/ai";

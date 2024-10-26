@@ -1,0 +1,25 @@
+"use client";
+import { useStateContext } from "@/contexts/ContextProvider";
+import { Header} from "@/components";
+import StackedChart from "@/components/Charts/StackedChart";
+
+const PyramidChartPage: React.FC = () => {
+	const { activeMenu } = useStateContext();
+
+	return (
+		<div className={activeMenu ? "md:ml-72" : "w-full flex-2"}>
+			<div className="m-2 md:m-10 py-4 px-2 md:p-10 bg-white rounded-3xl dark:text-gray-200 dark:bg-secondary-dark-bg">
+				<Header category={"Stacked"} title={"Revenue Breakdown"} />
+				<div className="w-full">
+          {/* Uncomment and set width and height as needed */}
+          <StackedChart
+						width={''}
+						height={''}
+					/>
+				</div>
+			</div>
+		</div>
+	);
+};
+
+export default PyramidChartPage;

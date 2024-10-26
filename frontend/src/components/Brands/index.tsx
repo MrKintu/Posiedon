@@ -1,3 +1,10 @@
+/*
+ * Created Date: Saturday, September 14th 2024, 2:14:37 am
+ * Author: Kintu Declan Trevor
+ * 
+ * Copyright (c) 2024 Kintu Declan Trevor
+ */
+
 import { Brand } from "@/types/brand";
 import Image from "next/image";
 import brandsData from "./brandsData";

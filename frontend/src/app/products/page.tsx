@@ -1,3 +1,10 @@
+/*
+ * Created Date: Saturday, September 14th 2024, 2:14:37 am
+ * Author: Kintu Declan Trevor
+ * 
+ * Copyright (c) 2024 Kintu Declan Trevor
+ */
+
 import SingleGen from "@/components/Generic/SingleGeneric";
 import GenericData from "@/components/Generic/genericData";
 import Breadcrumb from "@/components/Common/Breadcrumb";
@@ -6,7 +13,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Products Page | Mazu Marketing",
-  description: "This is Blog Page for Startup Nextjs Template",
+  description: "This is the products display page.",
   // other metadata
 };
 
@@ -31,7 +38,7 @@ const NewGeneric = () => {
             ))}
           </div>
 
-          <div className="-mx-4 flex flex-wrap" data-wow-delay=".15s">
+          {/* <div className="-mx-4 flex flex-wrap" data-wow-delay=".15s">
             <div className="w-full px-4">
               <ul className="flex items-center justify-center pt-8">
                 <li className="mx-1">
@@ -89,7 +96,7 @@ const NewGeneric = () => {
                 </li>
               </ul>
             </div>
-          </div>
+          </div> */}
         </div>
       </section>
     </>

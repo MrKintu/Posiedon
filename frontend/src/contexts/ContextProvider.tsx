@@ -1,11 +1,18 @@
+/*
+ * Created Date: Friday, October 4th 2024, 11:52:59 pm
+ * Author: Kintu Declan Trevor
+ * 
+ * Copyright (c) 2024 Kintu Declan Trevor
+ */
+
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-// Define a type for the context value
 interface StateContextType {
   activeMenu: boolean;
   setActiveMenu: React.Dispatch<React.SetStateAction<boolean>>;
+  toggleMenu: () => void;
   isClicked: typeof initialState;
   setIsClicked: React.Dispatch<React.SetStateAction<typeof initialState>>;
   handleClick: (key: keyof typeof initialState) => void;
@@ -22,12 +29,10 @@ interface StateContextType {
   setActiveThemeSettings: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-// Define a type for the props of the ContextProvider
 interface ContextProviderProps {
   children: ReactNode;
 }
 
-// Create a context with a default empty object
 const StateContext = createContext<StateContextType>({} as StateContextType);
 
 const initialState = {
@@ -38,23 +43,28 @@ const initialState = {
 };
 
 export const ContextProvider = ({ children }: ContextProviderProps) => {
-  console.log("Children passed to ContextProvider:", children);
-  
-  const [activeMenu, setActiveMenu] = useState(true);
+  const [activeMenu, setActiveMenu] = useState(false);
   const [isClicked, setIsClicked] = useState(initialState);
   const [screenSize, setScreenSize] = useState<number | undefined>(undefined);
   const [themeColor, setThemeColor] = useState("#FF5C8E");
   const [currentMode, setCurrentMode] = useState("light");
-  const [activeThemeSettings, setActiveThemeSettings] = useState(false);
+  const [activeThemeSettings, setActiveThemeSettings] = useState(false); // Active theme state
 
-  const setMode = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCurrentMode(e.target.value);
-    localStorage.setItem("themeMode", e.target.value);
+  const toggleMenu = () => {
+    setActiveMenu((prev) => {
+      const newValue = !prev;
+      localStorage.setItem("activeMenu", String(newValue)); // Update local storage whenever the menu state changes
+      return newValue;
+    });
+  };
 
+  const setMode = (newMode: string) => {
+    setCurrentMode(newMode);
+    localStorage.setItem("themeMode", newMode);
+  
     const head = document.getElementById("base-html");
-
-    if (e.target.value === "dark") {
-      head?.classList.add(e.target.value);
+    if (newMode === "dark") {
+      head?.classList.add("dark");
     } else {
       head?.classList.remove("dark");
     }
@@ -76,6 +86,8 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
   useEffect(() => {
     const savedThemeColor = localStorage.getItem("themeColor");
     const savedThemeMode = localStorage.getItem("themeMode");
+    const head = document.getElementById("base-html");
+    const handleResize = () => { setScreenSize(window.innerWidth); };
 
     if (savedThemeColor) {
       setThemeColor(savedThemeColor);
@@ -83,15 +95,32 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 
     if (savedThemeMode) {
       setCurrentMode(savedThemeMode);
-      const head = document.getElementById("base-html");
 
       if (savedThemeMode === "dark") {
-        head?.classList.add(savedThemeMode);
+        head?.classList.add("dark");
       } else {
         head?.classList.remove("dark");
       }
     }
-  }, []);
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("resize", handleResize);
+      handleResize();
+    }
+
+    if (typeof window !== "undefined") {
+      const storedActiveMenu = localStorage.getItem("activeMenu");
+      if (storedActiveMenu !== null) {
+        setActiveMenu(JSON.parse(storedActiveMenu));
+      } else {
+        setActiveMenu(false);
+      }
+    }
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [setScreenSize, setActiveMenu]);
 
   return (
     <StateContext.Provider
@@ -112,6 +141,7 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
         setColor,
         activeThemeSettings,
         setActiveThemeSettings,
+        toggleMenu,
       }}
     >
       {children}

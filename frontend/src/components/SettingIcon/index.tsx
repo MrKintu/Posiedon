@@ -1,3 +1,10 @@
+/*
+ * Created Date: Tuesday, October 8th 2024, 1:55:03 am
+ * Author: Kintu Declan Trevor
+ * 
+ * Copyright (c) 2024 Kintu Declan Trevor
+ */
+
 "use client";
 
 import React from "react";

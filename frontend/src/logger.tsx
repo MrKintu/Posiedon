@@ -1,3 +1,10 @@
+/*
+ * Created Date: Wednesday, October 2nd 2024, 3:37:14 pm
+ * Author: Kintu Declan Trevor
+ * 
+ * Copyright (c) 2024 Kintu Declan Trevor
+ */
+
 import { createLogger, format, transports } from 'winston';
 import { Format, TransformableInfo } from 'logform';
 import DailyRotateFile from 'winston-daily-rotate-file';

@@ -1,27 +1,40 @@
 import React from "react";
 import {
-    AiOutlineCalendar,
-    AiOutlineShoppingCart,
-    AiOutlineAreaChart,
-    AiOutlineBarChart,
-    AiOutlineStock,
+	AiOutlineCalendar,
+	AiOutlineShoppingCart,
+	AiOutlineAreaChart,
+	AiOutlineBarChart,
+	AiOutlineStock,
+	AiFillHome,
+	AiOutlineInfoCircle,
+	AiOutlineFileText,
+	AiOutlineTool,
 } from "react-icons/ai";
 import {
-    FiShoppingBag,
-    FiEdit,
-    FiPieChart,
-    FiBarChart,
-    FiCreditCard,
-    FiStar,
-    FiShoppingCart,
+	FiShoppingBag,
+  FiEdit,
+  FiPieChart,
+  FiBarChart,
+	FiCreditCard,
+	FiStar,
+	FiShoppingCart,
+	FiUser, 
 } from "react-icons/fi";
 import {
-    BsKanban,
-    BsBarChart,
-    BsBoxSeam,
-    BsCurrencyDollar,
-    BsShield,
-    BsChatLeft,
+	MdDashboard,
+	MdContactMail,
+} from "react-icons/md";
+import {
+  BiImage,
+  BiStar,
+} from "react-icons/bi";
+import {
+	BsKanban,
+	BsBarChart,
+	BsBoxSeam,
+	BsCurrencyDollar,
+	BsShield,
+	BsChatLeft,
 } from "react-icons/bs";
 import { BiColorFill } from "react-icons/bi";
 import { IoMdContacts } from "react-icons/io";
@@ -552,29 +565,32 @@ export const employeesGrid = [
 
 export const links = [
 	{
-		title: "Dashboard",
+		title: "Browse",
 		links: [
 			{
-				name: "ecommerce",
+				name: "Home",
+				path: "",
+				icon: <AiFillHome />,
+			},
+			{
+				name: "About",
+				path: "about",
+				icon: <AiOutlineInfoCircle />,
+			},
+			{
+				name: "Products",
+				path: "products",
 				icon: <FiShoppingBag />,
 			},
-		],
-	},
-
-	{
-		title: "Pages",
-		links: [
 			{
-				name: "orders",
-				icon: <AiOutlineShoppingCart />,
+				name: "Sign Up",
+				path: "sign-up",
+				icon: <FiShoppingBag />,
 			},
 			{
-				name: "employees",
-				icon: <IoMdContacts />,
-			},
-			{
-				name: "customers",
-				icon: <RiContactsLine />,
+				name: "Sign In",
+				path: "sign-in",
+				icon: <FiShoppingBag />,
 			},
 		],
 	},
@@ -583,19 +599,109 @@ export const links = [
 		links: [
 			{
 				name: "calendar",
+				path: "apps/calendar",
 				icon: <AiOutlineCalendar />,
 			},
 			{
 				name: "kanban",
+				path: "apps/kanban",
 				icon: <BsKanban />,
 			},
 			{
 				name: "editor",
+				path: "apps/editor",
 				icon: <FiEdit />,
 			},
 			{
-				name: "color-picker",
+				name: "Colour Picker",
+				path: "apps/colour-picker",
 				icon: <BiColorFill />,
+			},
+		],
+	},
+	{
+		title: "Customer",
+		links: [
+			{
+				name: "Dashboard",
+				path: "customer",
+				icon: <MdDashboard />,
+			},
+			{
+				name: "Contact",
+				path: "customer/contact",
+				icon: <MdContactMail />,
+			},
+			{
+				name: "Create Image",
+				path: "customer/create-image",
+				icon: <BiImage />,
+			},
+			{
+				name: "Create Post",
+				path: "customer/create-post",
+				icon: <AiOutlineFileText />,
+			},
+			{
+				name: "Profile",
+				path: "customer/profile",
+				icon: <FiUser />,
+			},
+			{
+				name: "SEO Tools",
+				path: "customer/seo-tools",
+				icon: <AiOutlineTool />,
+			},
+			{
+				name: "Strategy Tools",
+				path: "customer/strategy-tools",
+				icon: <AiOutlineTool />,
+			},
+		],
+	},
+
+	{
+		title: "Staff",
+		links: [
+			{
+				name: "Dashboard",
+				path: "staff",
+				icon: <MdDashboard />,
+			},
+			{
+				name: "Contact",
+				path: "staff/contact",
+				icon: <MdContactMail />,
+			},
+			{
+				name: "Customers",
+				path: "staff/customers",
+				icon: <RiContactsLine />,
+			},
+			{
+				name: "Employees",
+				path: "staff/employees",
+				icon: <IoMdContacts />,
+			},
+			{
+				name: "Orders",
+				path: "staff/orders",
+				icon: <AiOutlineShoppingCart />,
+			},
+			{
+				name: "Products",
+				path: "staff/products",
+				icon: <FiShoppingBag />,
+			},
+			{
+				name: "Profile",
+				path: "staff/profile",
+				icon: <FiUser />,
+			},
+			{
+				name: "Subscriptions",
+				path: "staff/subscriptions",
+				icon: <BiStar />,
 			},
 		],
 	},
@@ -604,35 +710,43 @@ export const links = [
 		links: [
 			{
 				name: "line",
+				path: "charts/line",
 				icon: <AiOutlineStock />,
 			},
 			{
 				name: "area",
+				path: "charts/area",
 				icon: <AiOutlineAreaChart />,
 			},
 
 			{
 				name: "bar",
+				path: "charts/bar",
 				icon: <AiOutlineBarChart />,
 			},
 			{
 				name: "pie",
+				path: "charts/pie",
 				icon: <FiPieChart />,
 			},
 			{
 				name: "financial",
+				path: "charts/financial",
 				icon: <RiStockLine />,
 			},
 			{
-				name: "color-mapping",
+				name: "colour mapping",
+				path: "charts/colour-mapping",
 				icon: <BsBarChart />,
 			},
 			{
 				name: "pyramid",
+				path: "charts/pyramid",
 				icon: <GiLouvrePyramid />,
 			},
 			{
 				name: "stacked",
+				path: "charts/stacked",
 				icon: <AiOutlineBarChart />,
 			},
 		],

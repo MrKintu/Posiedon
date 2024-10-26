@@ -1,3 +1,10 @@
+/*
+ * Created Date: Saturday, September 14th 2024, 2:14:37 am
+ * Author: Kintu Declan Trevor
+ * 
+ * Copyright (c) 2024 Kintu Declan Trevor
+ */
+
 import SectionTitle from "../Common/SectionTitle";
 import SingleBlog from "./SingleGeneric";
 import blogData from "./genericData";

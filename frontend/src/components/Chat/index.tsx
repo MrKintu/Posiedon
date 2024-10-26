@@ -1,3 +1,10 @@
+/*
+ * Created Date: Tuesday, October 8th 2024, 1:48:58 am
+ * Author: Kintu Declan Trevor
+ * 
+ * Copyright (c) 2024 Kintu Declan Trevor
+ */
+
 import React from "react";
 import Image from "next/image";
 import { useStateContext } from "@/contexts/ContextProvider";

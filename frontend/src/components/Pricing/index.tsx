@@ -1,3 +1,10 @@
+/*
+ * Created Date: Saturday, September 14th 2024, 2:14:37 am
+ * Author: Kintu Declan Trevor
+ * 
+ * Copyright (c) 2024 Kintu Declan Trevor
+ */
+
 "use client";
 import { useState } from "react";
 import SectionTitle from "../Common/SectionTitle";
