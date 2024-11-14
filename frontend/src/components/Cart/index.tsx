@@ -5,7 +5,7 @@
  * Copyright (c) 2024 Kintu Declan Trevor
  */
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useStateContext } from "@/contexts/ContextProvider";
 import { AiOutlineMinusSquare, AiOutlinePlusSquare } from "react-icons/ai";
 import { cartData } from "public/data/dummy";
@@ -22,6 +22,13 @@ interface CartItem {
 
 const Cart: React.FC = () => {
   const { handleClosingClick } = useStateContext();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true); // This ensures the component runs only on the client side
+  }, []);
+
+  if (!isClient) return null; // Ensure nothing is rendered on the server side
 
   return (
     <div className="bg-half-transparent w-screen fixed nav-item top-0 right-0">

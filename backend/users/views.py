@@ -12,10 +12,9 @@ from rest_framework import status, generics
 from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .models import Customer, Marketer, UserInfo
+from .models import Customer, Staff
 from .serializers import (UserSerializer, LoginSerializer, CustomerDetailSerializer, CustomerSerializer,
-                          MarketerSerializer, MarketerDetailSerializer, UserInfoSerializer,
-                          UserInfoDetailSerializer)
+                          StaffSerializer, StaffDetailSerializer)
 
 
 # Create New User
@@ -46,25 +45,8 @@ class LogoutView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-# Fetch all UserInfo
-class UserInfoList(generics.ListCreateAPIView):
-    queryset = UserInfo.objects.all().order_by('phone')
-    serializer_class = UserInfoSerializer
-    # authentication_classes = [JWTAuthentication]
-    # permission_classes = [IsAuthenticated]
-
-
-# Fetch Single UserInfo
-class UserInfoDetails(generics.RetrieveUpdateDestroyAPIView):
-    queryset = UserInfo.objects.all()
-    serializer_class = UserInfoDetailSerializer
-    lookup_field = 'phone'
-    # authentication_classes = [JWTAuthentication]
-    # permission_classes = [IsAuthenticated]
-
-
 # Fetch all Customers
-class CustomerList(generics.ListCreateAPIView):
+class CustomerList(generics.ListAPIView):
     queryset = Customer.objects.all().order_by('customer_id')
     serializer_class = CustomerSerializer
     # authentication_classes = [JWTAuthentication]
@@ -80,18 +62,18 @@ class CustomerDetails(generics.RetrieveUpdateDestroyAPIView):
     # permission_classes = [IsAuthenticated]
 
 
-# Fetch all Marketers
-class MarketerList(generics.ListCreateAPIView):
-    queryset = Marketer.objects.all().order_by('staff_id')
-    serializer_class = MarketerSerializer
+# Fetch all Staffs
+class StaffList(generics.ListAPIView):
+    queryset = Staff.objects.all().order_by('staff_id')
+    serializer_class = StaffSerializer
     # authentication_classes = [JWTAuthentication]
     # permission_classes = [IsAuthenticated]
 
 
-# Fetch Single Marketer
-class MarketerDetails(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Marketer.objects.all()
-    serializer_class = MarketerDetailSerializer
+# Fetch Single Staff
+class StaffDetails(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Staff.objects.all()
+    serializer_class = StaffDetailSerializer
     lookup_field = 'staff_id'
     # authentication_classes = [JWTAuthentication]
     # permission_classes = [IsAuthenticated]

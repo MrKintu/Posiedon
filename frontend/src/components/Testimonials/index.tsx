@@ -5,6 +5,9 @@
  * Copyright (c) 2024 Kintu Declan Trevor
  */
 
+"use client";
+
+import { useEffect, useState } from "react";
 import { Testimonial } from "@/types/testimonial";
 import SectionTitle from "../Common/SectionTitle";
 import SingleTestimonial from "./SingleTestimonial";
@@ -40,11 +43,21 @@ const testimonialData: Testimonial[] = [
 ];
 
 const Testimonials = () => {
+  const [mounted, setMounted] = useState(false);
+
+  // Ensure that the component renders only on the client side
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Prevent rendering during SSR
+  if (!mounted) return null;
+
   return (
     <section className="dark:bg-bg-color-dark bg-gray-light relative z-10 py-16 md:py-20 lg:py-28">
       <div className="container">
         <SectionTitle
-          title="What Our Users Says"
+          title="What Our Users Say"
           paragraph="There are many variations of passages of Lorem Ipsum available but the majority have suffered alteration in some form."
           center
         />
@@ -55,6 +68,8 @@ const Testimonials = () => {
           ))}
         </div>
       </div>
+
+      {/* Decorative SVGs */}
       <div className="absolute right-0 top-5 z-[-1]">
         <svg
           width="238"
@@ -161,9 +176,9 @@ const Testimonials = () => {
             <linearGradient
               id="paint2_linear_72:302"
               x1="256.267"
-              y1="64.6717"
+              y1="75.6717"
               x2="-40.8688"
-              y2="19.1572"
+              y2="30.1571"
               gradientUnits="userSpaceOnUse"
             >
               <stop stopColor="#4A6CF7" stopOpacity="0" />
@@ -172,9 +187,9 @@ const Testimonials = () => {
             <linearGradient
               id="paint3_linear_72:302"
               x1="256.267"
-              y1="76.6717"
+              y1="87.6717"
               x2="-40.8688"
-              y2="31.1572"
+              y2="32.1571"
               gradientUnits="userSpaceOnUse"
             >
               <stop stopColor="#4A6CF7" stopOpacity="0" />

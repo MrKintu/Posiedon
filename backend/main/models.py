@@ -6,7 +6,7 @@ Copyright (c) 2024 Kintu Declan Trevor
 '''
 
 from django.db import models
-from users.models import Customer, Marketer
+from users.models import Customer, Staff
 
 
 # Product Model
@@ -16,10 +16,10 @@ class Product(models.Model):
         ("B2C", "Business to Customer Marketing"),
     )
 
-    product_types = (
-        (1, "Branding and Identity Services"), 
+    product_categories = (
+        (1, "Content Creation and Strategy"),
         (2, "Marketing and Advertising Services"), 
-        (3, "Content Creation and Strategy"), 
+        (3, "Branding and Identity Services"),  
         (4, "E-Commerce Solutions")
     )
 
@@ -27,9 +27,9 @@ class Product(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(null=True)
     price = models.FloatField(blank=True)
-    marketers = models.ManyToManyField(Marketer, blank=True, related_name='product_marketers')
+    staff = models.ManyToManyField(Staff, blank=True, related_name='product_staff')
     target = models.CharField(max_length=50, choices=target_choices, null=True)
-    type = models.CharField(max_length=50, choices=product_types, null=True) # type: ignore
+    category = models.CharField(max_length=50, choices=product_categories, null=True) # type: ignore
 
     def __str__(self):
         return self.product_id
@@ -37,7 +37,7 @@ class Product(models.Model):
 
 # Subscription Model
 class Subscribe(models.Model):
-    subscribe_id = models.CharField(max_length=15, null=True, blank=True, unique=True)
+    subscribe_id = models.CharField(max_length=10, null=True, blank=True, unique=True)
     title = models.CharField(max_length=200)
     description = models.TextField(null=True)
     price = models.FloatField(blank=True)
@@ -49,10 +49,11 @@ class Subscribe(models.Model):
 
 # Ownership Model
 class Owner(models.Model):
-    owner_id = models.CharField(max_length=10, null=True, blank=True, unique=True)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True, 
+    owner_id = models.CharField(max_length=15, null=True, blank=True, unique=True)
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True, 
                                  related_name='owner_customer')
-    products = models.ManyToManyField(Product, blank=True, related_name='owner_products')
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, 
+                                related_name='owner_product')
     subscribe = models.ForeignKey(Subscribe, on_delete=models.SET_NULL, null=True, blank=True, 
                                   related_name='owner_subscribe')
     start = models.DateTimeField(auto_now_add=True)
@@ -71,7 +72,8 @@ class Cart(models.Model):
     cart_id = models.CharField(max_length=10, null=True, blank=True, unique=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True, 
                                  related_name='cart_customer')
-    products = models.ManyToManyField(Product, blank=True, related_name='cart_products')
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, 
+                                 related_name='cart_product')
     subscribe = models.ForeignKey(Subscribe, on_delete=models.SET_NULL, null=True, blank=True, 
                                   related_name='cart_subscribe')
     total = models.FloatField(blank=True)
@@ -99,7 +101,7 @@ class Review(models.Model):
     review_id = models.CharField(max_length=15, null=True, blank=True, unique=True)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True,
                                 related_name='review_product')
-    subcribe = models.ForeignKey(Subscribe, on_delete=models.SET_NULL, null=True, blank=True,
+    subscribe = models.ForeignKey(Subscribe, on_delete=models.SET_NULL, null=True, blank=True,
                                  related_name='review_subscribe')
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True,
                                  related_name='review_customer')

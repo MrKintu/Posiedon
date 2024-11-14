@@ -6,13 +6,21 @@
  */
 
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SectionTitle from "../Common/SectionTitle";
 import OfferList from "./OfferList";
 import PricingBox from "./PricingBox";
 
 const Pricing = () => {
   const [isMonthly, setIsMonthly] = useState(true);
+  const [isClient, setIsClient] = useState(false);  // Track client-side rendering
+
+  useEffect(() => {
+    setIsClient(true);  // Set to true once the component is mounted on the client side
+  }, []);
+
+  // Skip rendering if not on the client-side to avoid hydration issues
+  if (!isClient) return null;
 
   return (
     <section id="pricing" className="relative z-10 py-16 md:py-20 lg:py-28">

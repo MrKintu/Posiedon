@@ -29,24 +29,19 @@ interface NavButtonProps {
   dotColor: string;
 }
 
-const NavButton: React.FC<NavButtonProps> = ({ title, icon, customFunc, color, dotColor }) => {
-  return (
-    <TooltipComponent content={title} position="BottomCenter">
-      <button
-        type="button"
-        style={{ color: color }}
-        onClick={customFunc}
-        className="relative text-xl rounded-full p-3 hover:bg-light-gray"
-      >
-        <span
-          style={{ background: dotColor }}
-          className="absolute inline-flex rounded-full h-2 w-2 right-2 top-2"
-        />
-        {icon}
-      </button>
-    </TooltipComponent>
-  );
-};
+const NavButton: React.FC<NavButtonProps> = ({ title, icon, customFunc, color, dotColor }) => (
+  <TooltipComponent content={title} position="BottomCenter">
+    <button
+      type="button"
+      style={{ color }}
+      onClick={customFunc}
+      className="relative text-xl rounded-full p-3 hover:bg-light-gray"
+    >
+      <span style={{ background: dotColor }} className="absolute inline-flex rounded-full h-2 w-2 right-2 top-2" />
+      {icon}
+    </button>
+  </TooltipComponent>
+);
 
 const Navbar: React.FC = () => {
   const {
@@ -59,8 +54,12 @@ const Navbar: React.FC = () => {
     setScreenSize,
     setActiveThemeSettings,
   } = useStateContext();
-
+  const [isClient, setIsClient] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    setIsClient(true); // Ensure client-side rendering
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -72,8 +71,15 @@ const Navbar: React.FC = () => {
   }, [setScreenSize]);
 
   useEffect(() => {
-    screenSize <= 900 ? setActiveMenu(false) : setActiveMenu(true);
+    if (screenSize <= 900) {
+      setActiveMenu(false);
+    } else {
+      setActiveMenu(true);
+    }
   }, [screenSize, setActiveMenu]);
+
+  // Skip rendering for hydration issues
+  if (!isClient) return null;
 
   return (
     <div className="w-full flex-2 fixed top-0 z-40 bg-main-bg dark:bg-main-dark-bg">
@@ -81,11 +87,11 @@ const Navbar: React.FC = () => {
         <div className="flex justify-between p-2 md:mx-6 relative">
           {/* Left Side - Menu Button */}
           <NavButton
-            title={"Menu"}
+            title="Menu"
             icon={<AiOutlineMenu />}
             customFunc={() => setActiveMenu((prev) => !prev)}
             color={themeColor}
-            dotColor={"transparent"}
+            dotColor="transparent"
           />
 
           {/* Center - Links from Header */}
@@ -93,7 +99,6 @@ const Navbar: React.FC = () => {
             {menuData.map((menuItem, index) => (
               <div key={index}>
                 {menuItem.path ? (
-                  // Render links with valid paths
                   <Link href={menuItem.path}>
                     <span
                       className={`py-2 text-base ${
@@ -106,7 +111,6 @@ const Navbar: React.FC = () => {
                     </span>
                   </Link>
                 ) : (
-                  // Render static text or placeholder for items without paths
                   <span className="py-2 text-base text-dark dark:text-white/70">
                     {menuItem.title}
                   </span>
@@ -118,31 +122,31 @@ const Navbar: React.FC = () => {
           {/* Right Side - Icons and Theme Toggler */}
           <div className="flex items-center">
             <NavButton
-              title={"Cart"}
+              title="Cart"
               icon={<FiShoppingCart />}
               customFunc={() => handleClick("cart")}
               color={themeColor}
-              dotColor={"transparent"}
+              dotColor="transparent"
             />
 
             <NavButton
-              title={"Chat"}
+              title="Chat"
               icon={<BsChatLeft />}
               customFunc={() => handleClick("chat")}
               color={themeColor}
-              dotColor={"#03c9d7"}
+              dotColor="#03c9d7"
             />
 
             <NavButton
-              title={"Notifications"}
+              title="Notifications"
               icon={<RiNotification3Line />}
               customFunc={() => handleClick("notification")}
               color={themeColor}
-              dotColor={"#03c9d7"}
+              dotColor="#03c9d7"
             />
 
             {/* Profile Section */}
-            <TooltipComponent content={"Profile"} position="BottomCenter">
+            <TooltipComponent content="Profile" position="BottomCenter">
               <div
                 className="flex items-center gap-2 cursor-pointer p-1 hover:bg-light-gray rounded-lg"
                 onClick={() => handleClick("userProfile")}
@@ -152,7 +156,6 @@ const Navbar: React.FC = () => {
                   <span>Hi, </span>
                   <span className="font-bold ml-1">Hossam</span>
                 </p>
-                {/* Remove dropdown arrow */}
               </div>
             </TooltipComponent>
 

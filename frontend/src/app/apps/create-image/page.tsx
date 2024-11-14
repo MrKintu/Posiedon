@@ -7,34 +7,44 @@
 
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStateContext } from '@/contexts/ContextProvider';
 
 const ChatPage = () => {
   const { currentMode } = useStateContext();
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<(string | File)[]>([]); // Allow messages to store either text or files
-  const [selectedFile, setSelectedFile] = useState<File | null>(null); // To store the selected file
+  const [messages, setMessages] = useState<(string | File)[]>([]);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isClient, setIsClient] = useState(false); // Track client-side rendering
+
+  useEffect(() => {
+    setIsClient(true); // Set isClient to true after the component mounts
+  }, []);
 
   // Handle sending messages by clicking the button or pressing 'Enter'
   const handleSendClick = () => {
     if (input.trim() || selectedFile) {
-      setMessages([...messages, selectedFile ? selectedFile : input]); // Add file or input to messages
-      setInput(''); // Clear the input field
-      setSelectedFile(null); // Clear selected file
+      setMessages([...messages, selectedFile ? selectedFile : input]);
+      setInput('');
+      setSelectedFile(null);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      handleSendClick(); // Trigger send on Enter key press
+      handleSendClick();
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]; // Get the first selected file
-    setSelectedFile(file || null); // Set the file or null if no file is selected
+    const file = e.target.files?.[0];
+    setSelectedFile(file || null);
   };
+
+  // Prevent rendering until the component is mounted on the client
+  if (!isClient) {
+    return null;
+  }
 
   return (
     <div className={`chat-page ${currentMode === 'dark' ? 'dark-theme' : 'light-theme'}`}>
@@ -44,10 +54,10 @@ const ChatPage = () => {
           {messages.map((msg, idx) => (
             <div key={idx} className="chat-message">
               {typeof msg === 'string' ? (
-                msg // Display text message
+                msg
               ) : (
                 <a href={URL.createObjectURL(msg)} target="_blank" rel="noopener noreferrer">
-                  {msg.name} {/* Display file name */}
+                  {msg.name}
                 </a>
               )}
             </div>
@@ -84,7 +94,7 @@ const ChatPage = () => {
           display: flex;
           flex-direction: column;
           flex: 1;
-          padding-top: 20px; /* Added padding to ensure it's spaced from navbar */
+          padding-top: 20px;
         }
         .main-content {
           display: flex;

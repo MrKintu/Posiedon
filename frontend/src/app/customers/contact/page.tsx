@@ -6,10 +6,10 @@
  */
 
 "use client";
-import React from "react";
+
+import React, { useState, useEffect } from "react";
 import { useStateContext } from "@/contexts/ContextProvider";
 import ContactSidebar from "@/components/ContactSidebar";
-import { useState } from "react";
 
 interface Contact {
   id: number;
@@ -22,6 +22,12 @@ const ContactPage: React.FC = () => {
   const [messages, setMessages] = useState<string[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const { themeColor } = useStateContext();
+  const [isClient, setIsClient] = useState(false);
+
+  // Hydration: Set isClient to true after component mounts
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleSendMessage = () => {
     if (inputMessage.trim()) {
@@ -30,14 +36,21 @@ const ContactPage: React.FC = () => {
     }
   };
 
+  // Don't render content until hydration is complete
+  if (!isClient) {
+    return null; // You could return a loading spinner here as an alternative
+  }
+
   return (
     <section className="flex h-full">
-      <div className="flex h-full w-full" 
+      <div
+        className="flex h-full w-full"
         style={{
           border: `2px solid ${themeColor}`,
           borderRadius: "8px",
           padding: "16px",
-        }}>
+        }}
+      >
         {/* Contact Sidebar */}
         <div className="w-1/3 bg-gray-100 dark:bg-gray-800 p-4 overflow-y-auto">
           <ContactSidebar onSelectUser={setSelectedUser} />

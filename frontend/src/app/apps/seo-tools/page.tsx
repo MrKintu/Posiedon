@@ -1,16 +1,28 @@
+/*
+ * Created Date: Wednesday, October 2nd 2024, 5:22:29 pm
+ * Author: Kintu Declan Trevor
+ * 
+ * Copyright (c) 2024 Kintu Declan Trevor
+ */
+
+"use client";
+
+import { useState, useEffect } from "react";
 import SharePost from "@/components/Generic/SharePost";
 import TagButton from "@/components/Generic/TagButton";
 import Image from "next/image";
 
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Blog Details Page | Free Next.js Template for Startup and SaaS",
-  description: "This is Blog Details Page for Startup Nextjs Template",
-  // other metadata
-};
-
 const BlogDetailsPage = () => {
+  const [isClient, setIsClient] = useState(false);
+
+  // Ensure the component renders only on the client-side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Render nothing on the server
+  if (!isClient) return null;
+
   return (
     <>
       <section className="pb-[120px] pt-[150px]">

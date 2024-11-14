@@ -5,9 +5,22 @@
  * Copyright (c) 2024 Kintu Declan Trevor
  */
 
+'use client';
+
+import { useEffect, useState } from 'react';
 import Image from "next/image";
 
 const AboutSectionTwo = () => {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return null;
+  }
+
   return (
     <section className="py-16 md:py-20 lg:py-28">
       <div className="container">

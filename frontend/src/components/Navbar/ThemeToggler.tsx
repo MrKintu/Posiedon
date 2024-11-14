@@ -5,11 +5,14 @@
  * Copyright (c) 2024 Kintu Declan Trevor
  */
 
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { useStateContext } from "@/contexts/ContextProvider";
 
 const ThemeToggler: React.FC = () => {
   const { currentMode, setMode, setActiveThemeSettings } = useStateContext();
+  const [isClient, setIsClient] = useState(false);  // Manage client-side state
 
   // Toggle between light and dark mode using the context
   const toggleTheme = () => {
@@ -21,6 +24,13 @@ const ThemeToggler: React.FC = () => {
   const openThemeSettings = () => {
     setActiveThemeSettings(true);  // Set the theme settings panel to active
   };
+
+  useEffect(() => {
+    setIsClient(true); // Set client-side state to true once mounted
+  }, []);
+
+  // Skip rendering during hydration issues
+  if (!isClient) return null;
 
   return (
     <div className="flex items-center">

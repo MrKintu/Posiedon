@@ -5,19 +5,34 @@
  * Copyright (c) 2024 Kintu Declan Trevor
  */
 
+import React, { useEffect, useState } from "react";
 import { useStateContext } from "@/contexts/ContextProvider";
 
 interface ButtonProps {
   color: string;
   text: string;
   borderRadius: string;
-  size: string;
-  classes?: string; // Optional props should be marked as such
-  func?: () => void; // The onClick function should be typed properly
+  size: "sm" | "md" | "lg";
+  classes?: string;
+  func?: () => void;
 }
 
-const Button: React.FC<ButtonProps> = ({ color, text, borderRadius, size, classes, func }) => {
+const Button: React.FC<ButtonProps> = ({
+  color,
+  text,
+  borderRadius,
+  size,
+  classes = "",
+  func,
+}) => {
   const { themeColor } = useStateContext();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true); // Ensure this runs only on the client side
+  }, []);
+
+  if (!isClient) return null; // Prevent rendering on the server side
 
   return (
     <button

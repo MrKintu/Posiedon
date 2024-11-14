@@ -7,7 +7,7 @@
 
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -15,11 +15,28 @@ interface ChatInputProps {
 
 const ChatInput: React.FC<ChatInputProps> = ({ onSend }) => {
   const [input, setInput] = useState('');
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true); // Set hydrated state after the component mounts
+  }, []);
 
   const handleSendClick = () => {
-    onSend(input);
-    setInput('');
+    if (input.trim()) {
+      onSend(input);
+      setInput('');
+    }
   };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && input.trim()) {
+      handleSendClick();
+    }
+  };
+
+  if (!isClient) {
+    return null; // Prevent rendering before hydration is complete
+  }
 
   return (
     <div className="chat-input">
@@ -29,6 +46,8 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend }) => {
         onChange={(e) => setInput(e.target.value)}
         placeholder="Type your message..."
         className="text-black p-2 border border-gray-300 rounded"
+        onKeyDown={handleKeyPress}
+        aria-label="Message input"
       />
       <button onClick={handleSendClick}>Send</button>
       <style jsx>{`

@@ -5,11 +5,24 @@
  * Copyright (c) 2024 Kintu Declan Trevor
  */
 
+'use client';
+
+import { useEffect, useState } from "react";
 import { Brand } from "@/types/brand";
 import Image from "next/image";
 import brandsData from "./brandsData";
 
 const Brands = () => {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return null;
+  }
+
   return (
     <section className="pt-16">
       <div className="container">

@@ -453,7 +453,7 @@ export const LinePrimaryXAxis: AxisModel = {
 	intervalType: 'Years',
 	edgeLabelPlacement: 'Shift',
 	majorGridLines: { width: 0 },
-	background: 'white',
+	// background: 'white',
 };
 
 export const LinePrimaryYAxis: AxisModel = {
@@ -603,9 +603,19 @@ export const links = [
 				icon: <AiOutlineCalendar />,
 			},
 			{
-				name: "kanban",
-				path: "apps/kanban",
-				icon: <BsKanban />,
+				name: "Colour Picker",
+				path: "apps/colour-picker",
+				icon: <BiColorFill />,
+			},
+			{
+				name: "Create Image",
+				path: "apps/create-image",
+				icon: <BiImage />,
+			},
+			{
+				name: "Create Post",
+				path: "apps/create-post",
+				icon: <AiOutlineFileText />,
 			},
 			{
 				name: "editor",
@@ -613,9 +623,19 @@ export const links = [
 				icon: <FiEdit />,
 			},
 			{
-				name: "Colour Picker",
-				path: "apps/colour-picker",
-				icon: <BiColorFill />,
+				name: "kanban",
+				path: "apps/kanban",
+				icon: <BsKanban />,
+			},
+			{
+				name: "SEO Tools",
+				path: "apps/seo-tools",
+				icon: <AiOutlineTool />,
+			},
+			{
+				name: "Strategy Tools",
+				path: "apps/strategy-tools",
+				icon: <AiOutlineTool />,
 			},
 		],
 	},
@@ -629,33 +649,23 @@ export const links = [
 			},
 			{
 				name: "Contact",
-				path: "customer/contact",
+				path: "customers/contact",
 				icon: <MdContactMail />,
 			},
 			{
-				name: "Create Image",
-				path: "customer/create-image",
-				icon: <BiImage />,
+				name: "Orders",
+				path: "customers/orders",
+				icon: <AiOutlineShoppingCart />,
 			},
 			{
-				name: "Create Post",
-				path: "customer/create-post",
-				icon: <AiOutlineFileText />,
+				name: "Ownerships",
+				path: "customers/ownerships",
+				icon: <AiOutlineShoppingCart />,
 			},
 			{
 				name: "Profile",
-				path: "customer/profile",
+				path: "customers/profile",
 				icon: <FiUser />,
-			},
-			{
-				name: "SEO Tools",
-				path: "customer/seo-tools",
-				icon: <AiOutlineTool />,
-			},
-			{
-				name: "Strategy Tools",
-				path: "customer/strategy-tools",
-				icon: <AiOutlineTool />,
 			},
 		],
 	},
@@ -709,25 +719,19 @@ export const links = [
 		title: "Charts",
 		links: [
 			{
-				name: "line",
-				path: "charts/line",
-				icon: <AiOutlineStock />,
-			},
-			{
 				name: "area",
 				path: "charts/area",
 				icon: <AiOutlineAreaChart />,
 			},
-
 			{
 				name: "bar",
 				path: "charts/bar",
 				icon: <AiOutlineBarChart />,
 			},
 			{
-				name: "pie",
-				path: "charts/pie",
-				icon: <FiPieChart />,
+				name: "colour mapping",
+				path: "charts/colour-mapping",
+				icon: <BsBarChart />,
 			},
 			{
 				name: "financial",
@@ -735,9 +739,14 @@ export const links = [
 				icon: <RiStockLine />,
 			},
 			{
-				name: "colour mapping",
-				path: "charts/colour-mapping",
-				icon: <BsBarChart />,
+				name: "line",
+				path: "charts/line",
+				icon: <AiOutlineStock />,
+			},
+			{
+				name: "pie",
+				path: "charts/pie",
+				icon: <FiPieChart />,
 			},
 			{
 				name: "pyramid",

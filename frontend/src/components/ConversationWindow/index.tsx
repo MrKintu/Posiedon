@@ -7,7 +7,30 @@
 
 "use client";
 
-const ConversationWindow = ({ selectedContact }) => {
+import { useState, useEffect } from "react";
+
+interface Contact {
+  id: number;
+  name: string;
+  lastMessage: string;
+}
+
+interface ConversationWindowProps {
+  selectedContact: Contact | null;
+}
+
+const ConversationWindow: React.FC<ConversationWindowProps> = ({ selectedContact }) => {
+  const [isClient, setIsClient] = useState(false);
+
+  // Set isClient to true after the component mounts on the client
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return null; // Prevent rendering until client-side hydration is complete
+  }
+
   if (!selectedContact) {
     return <div className="p-4">Select a contact to view the conversation</div>;
   }

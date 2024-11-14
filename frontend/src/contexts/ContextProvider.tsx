@@ -7,7 +7,7 @@
 
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useMemo, ReactNode } from "react";
 
 interface StateContextType {
   activeMenu: boolean;
@@ -23,7 +23,7 @@ interface StateContextType {
   setCurrentMode: React.Dispatch<React.SetStateAction<string>>;
   themeColor: string;
   setThemeColor: React.Dispatch<React.SetStateAction<string>>;
-  setMode: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  setMode: (newMode: string) => void;
   setColor: (color: string) => void;
   activeThemeSettings: boolean;
   setActiveThemeSettings: React.Dispatch<React.SetStateAction<boolean>>;
@@ -33,8 +33,6 @@ interface ContextProviderProps {
   children: ReactNode;
 }
 
-const StateContext = createContext<StateContextType>({} as StateContextType);
-
 const initialState = {
   chat: false,
   cart: false,
@@ -42,37 +40,53 @@ const initialState = {
   notification: false,
 };
 
+const StateContext = createContext<StateContextType>({} as StateContextType);
+
 export const ContextProvider = ({ children }: ContextProviderProps) => {
-  const [activeMenu, setActiveMenu] = useState(false);
+  const [activeMenu, setActiveMenu] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return JSON.parse(localStorage.getItem("activeMenu") || "false");
+    }
+    return false;
+  });
+
   const [isClicked, setIsClicked] = useState(initialState);
   const [screenSize, setScreenSize] = useState<number | undefined>(undefined);
   const [themeColor, setThemeColor] = useState("#FF5C8E");
   const [currentMode, setCurrentMode] = useState("light");
-  const [activeThemeSettings, setActiveThemeSettings] = useState(false); // Active theme state
+  const [activeThemeSettings, setActiveThemeSettings] = useState(false);
 
-  const toggleMenu = () => {
-    setActiveMenu((prev) => {
-      const newValue = !prev;
-      localStorage.setItem("activeMenu", String(newValue)); // Update local storage whenever the menu state changes
-      return newValue;
-    });
-  };
+  useEffect(() => {
+    const savedThemeColor = localStorage.getItem("themeColor");
+    const savedThemeMode = localStorage.getItem("themeMode");
+
+    if (savedThemeColor) setThemeColor(savedThemeColor);
+    if (savedThemeMode) setCurrentMode(savedThemeMode);
+
+    if (typeof window !== "undefined") {
+      const handleResize = () => setScreenSize(window.innerWidth);
+      window.addEventListener("resize", handleResize);
+      handleResize();
+      return () => window.removeEventListener("resize", handleResize);
+    }
+  }, []);
 
   const setMode = (newMode: string) => {
-    setCurrentMode(newMode);
-    localStorage.setItem("themeMode", newMode);
-  
-    const head = document.getElementById("base-html");
-    if (newMode === "dark") {
-      head?.classList.add("dark");
-    } else {
-      head?.classList.remove("dark");
+    if (newMode !== currentMode) {
+      setCurrentMode(newMode);
+      localStorage.setItem("themeMode", newMode);
+
+      const head = document.getElementById("base-html");
+      if (newMode === "dark") head?.classList.add("dark");
+      else head?.classList.remove("dark");
     }
   };
 
   const setColor = (color: string) => {
-    setThemeColor(color);
-    localStorage.setItem("themeColor", color);
+    if (color !== themeColor) {
+      setThemeColor(color);
+      localStorage.setItem("themeColor", color);
+    }
   };
 
   const handleClick = (key: keyof typeof initialState) => {
@@ -83,67 +97,36 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
     setIsClicked({ ...initialState, [key]: false });
   };
 
-  useEffect(() => {
-    const savedThemeColor = localStorage.getItem("themeColor");
-    const savedThemeMode = localStorage.getItem("themeMode");
-    const head = document.getElementById("base-html");
-    const handleResize = () => { setScreenSize(window.innerWidth); };
+  const toggleMenu = () => {
+    setActiveMenu((prev) => {
+      const newValue = !prev;
+      localStorage.setItem("activeMenu", JSON.stringify(newValue));
+      return newValue;
+    });
+  };
 
-    if (savedThemeColor) {
-      setThemeColor(savedThemeColor);
-    }
-
-    if (savedThemeMode) {
-      setCurrentMode(savedThemeMode);
-
-      if (savedThemeMode === "dark") {
-        head?.classList.add("dark");
-      } else {
-        head?.classList.remove("dark");
-      }
-    }
-
-    if (typeof window !== "undefined") {
-      window.addEventListener("resize", handleResize);
-      handleResize();
-    }
-
-    if (typeof window !== "undefined") {
-      const storedActiveMenu = localStorage.getItem("activeMenu");
-      if (storedActiveMenu !== null) {
-        setActiveMenu(JSON.parse(storedActiveMenu));
-      } else {
-        setActiveMenu(false);
-      }
-    }
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [setScreenSize, setActiveMenu]);
+  const contextValue = useMemo(() => ({
+    activeMenu,
+    setActiveMenu,
+    isClicked,
+    setIsClicked,
+    handleClick,
+    handleClosingClick,
+    screenSize,
+    setScreenSize,
+    currentMode,
+    setCurrentMode,
+    themeColor,
+    setThemeColor,
+    setMode,
+    setColor,
+    activeThemeSettings,
+    setActiveThemeSettings,
+    toggleMenu,
+  }), [activeMenu, isClicked, screenSize, currentMode, themeColor, activeThemeSettings]);
 
   return (
-    <StateContext.Provider
-      value={{
-        activeMenu,
-        setActiveMenu,
-        isClicked,
-        setIsClicked,
-        handleClick,
-        handleClosingClick,
-        screenSize,
-        setScreenSize,
-        currentMode,
-        setCurrentMode,
-        themeColor,
-        setThemeColor,
-        setMode,
-        setColor,
-        activeThemeSettings,
-        setActiveThemeSettings,
-        toggleMenu,
-      }}
-    >
+    <StateContext.Provider value={contextValue}>
       {children}
     </StateContext.Provider>
   );

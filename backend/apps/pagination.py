@@ -1,0 +1,22 @@
+'''
+Created Date: Tuesday, August 6th 2024, 7:48:06 pm
+Author: Kintu Declan Trevor
+
+Copyright (c) 2024 Kintu Declan Trevor
+'''
+
+from rest_framework import pagination # type: ignore
+from rest_framework.response import Response
+
+
+class CustomPagination(pagination.PageNumberPagination):
+    def get_paginated_response(self, data):
+        send = {
+            'links': {
+                'next': self.get_next_link(),
+                'previous': self.get_previous_link()
+            },
+            'count': self.page.paginator.count,
+            'data': data
+        }
+        return Response(send)

@@ -1,231 +1,230 @@
+/*
+ * Created Date: Saturday, September 14th 2024, 2:14:37 am
+ * Author: Kintu Declan Trevor
+ * 
+ * Copyright (c) 2024 Kintu Declan Trevor
+ */
+
+"use client";
+
 import Link from "next/link";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import ApiClient from "@/utilities/api_client";
+import { useAuthContext } from "@/contexts/AuthContext";
 
-import { Metadata } from "next";
+interface UserDetails {
+  first_name: string;
+  last_name: string;
+  email: string;
+  password: string;
+  confirm_password: string; 
+  business: string;
+  years: number;
+  phone: string;
+  industry: string;
+  city: string;
+  state: string;
+  country: string;
+  description: string;
+}
 
-export const metadata: Metadata = {
-  title: "Sign Up Page | Free Next.js Template for Startup and SaaS",
-  description: "This is Sign Up Page for Startup Nextjs Template",
-  // other metadata
-};
+const Signup = () => {
+  const router = useRouter();
+  const { setAuthContext } = useAuthContext();  // Destructure setAuthContext from context
+  const [userDetails, setUserDetails] = useState<UserDetails>({
+    first_name: "",
+    last_name: "",
+    email: "",
+    password: "",
+    confirm_password: "",
+    business: "",
+    years: 0,
+    phone: "",
+    industry: "",
+    city: "",
+    state: "",
+    country: "",
+    description: "",
+  });
+  const [errors, setErrors] = useState<string[]>([]);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);  // State to handle hydration issue
 
-const SignupPage = () => {
+  // Use useEffect to handle hydration issue
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setUserDetails((prev) => ({
+      ...prev,
+      [name]: name === "years" ? parseInt(value, 10) : value,
+    }));
+  };
+
+  const validateInputs = () => {
+    const newErrors: string[] = [];
+    const { first_name, last_name, email, password, confirm_password, business, years, phone, city, state, country, description } = userDetails;
+
+    if (!first_name || !last_name || !email || !password || !confirm_password || !business || !years || !phone || !city || !state || !country || !description) {
+      newErrors.push("All fields are required.");
+    }
+
+    if (password.length < 8) newErrors.push("Password must be at least 8 characters long.");
+    if (password !== confirm_password) newErrors.push("Passwords do not match.");
+    if (years <= 0) newErrors.push("Years in business must be a positive integer.");
+    if (!/^\d+$/.test(phone)) newErrors.push("Phone number must be a valid number.");
+
+    setErrors(newErrors);
+    return newErrors.length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateInputs()) return;
+
+    const payload = {
+      first_name: userDetails.first_name,
+      last_name: userDetails.last_name,
+      email: userDetails.email,
+      password: userDetails.password,
+      is_staff: false,
+      customer: {
+        business: userDetails.business,
+        years: userDetails.years,
+        phone: parseInt(userDetails.phone, 10),
+        description: userDetails.description,
+        industry: userDetails.industry,
+        city: userDetails.city,
+        state: userDetails.state,
+        country: userDetails.country,
+      },
+    };
+
+    try {
+      const response = await ApiClient.post("users/sign-up/", payload);
+
+      if (response.error) throw new Error(response.error);
+
+      setAuthContext({ isLoggedIn: true, username: userDetails.first_name });  // Update AuthContext on successful sign-up
+      setSuccessMessage("Sign-up successful! Redirecting to your account...");
+      setTimeout(() => router.push("/customers"), 2000);
+    } catch (error) {
+      setErrors(["An error occurred. Please try again later."]);
+    }
+  };
+
+  const industryOptions = [
+    "Transportation",
+    "Pharmaceutical",
+    "Telecommunications",
+    "Manufacturing",
+    "Mining",
+    "Hospitality",
+    "Media and News",
+    "Agriculture",
+    "Engineering and Technology",
+    "Education",
+    "Finance and Economics",
+    "Health Care"
+  ];
+
+  if (!isClient) return null;  // Ensure that rendering happens only on the client side
+
   return (
-    <>
-      <section className="relative z-10 overflow-hidden pb-16 pt-36 md:pb-20 lg:pb-28 lg:pt-[180px]">
-        <div className="container">
-          <div className="-mx-4 flex flex-wrap">
-            <div className="w-full px-4">
-              <div className="shadow-three mx-auto max-w-[500px] rounded bg-white px-6 py-10 dark:bg-dark sm:p-[60px]">
-                <h3 className="mb-3 text-center text-2xl font-bold text-black dark:text-white sm:text-3xl">
-                  Create your account
-                </h3>
-                <p className="mb-11 text-center text-base font-medium text-body-color">
-                  It’s totally free and super easy
-                </p>
-
-                <div className="mb-8 flex items-center justify-center">
-                  <span className="hidden h-[1px] w-full max-w-[60px] bg-body-color/50 sm:block"></span>
-                  <p className="w-full px-5 text-center text-base font-medium text-body-color">
-                    Register with your full name & email address.
-                  </p>
-                  <span className="hidden h-[1px] w-full max-w-[60px] bg-body-color/50 sm:block"></span>
+    <section className="relative z-10 overflow-hidden pb-16 pt-36 md:pb-20 lg:pb-28 lg:pt-[180px]">
+      <div className="container">
+        <div className="-mx-4 flex flex-wrap">
+          <div className="w-full px-4">
+            <div className="shadow-three mx-auto max-w-[500px] rounded bg-white px-6 py-10 dark:bg-dark sm:p-[60px]">
+              <h3 className="mb-3 text-center text-2xl font-bold text-black dark:text-white sm:text-3xl">
+                Create your free account
+              </h3>
+              {errors.length > 0 && (
+                <div className="mb-4 text-red-500">
+                  {errors.map((error, index) => (
+                    <p key={index}>{error}</p>
+                  ))}
                 </div>
-                <form>
-                  <div className="mb-8">
-                    <label
-                      htmlFor="name"
-                      className="mb-3 block text-sm text-dark dark:text-white"
-                    >
-                      {" "}
-                      First Name{" "}
+              )}
+              {successMessage && (
+                <div className="mb-4 text-green-500">
+                  <p>{successMessage}</p>
+                </div>
+              )}
+              <form onSubmit={handleSubmit}>
+                {["first_name", "last_name", "email", "password", "confirm_password", "business", "years", "phone", "city", "state", "country"].map((field) => (
+                  <div key={field} className="mb-8">
+                    <label htmlFor={field} className="mb-3 block text-sm text-dark dark:text-white">
+                      {field.replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase())} 
                     </label>
                     <input
-                      type="text"
-                      name="first_name"
-                      placeholder="Enter your First Name"
+                      type={field === "email" ? "email" : field === "password" || field === "confirm_password" ? "password" : field === "years" ? "number" : field === "phone" ? "tel" : "text"}
+                      name={field}
+                      id={field}
+                      required
+                      placeholder={`Enter your ${field.replace(/_/g, ' ')}`}
+                      value={userDetails[field as keyof UserDetails]}
+                      onChange={handleChange}
+                      spellCheck="true"
                       className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-sm border bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
                     />
                   </div>
-                  <div className="mb-8">
-                    <label
-                      htmlFor="name"
-                      className="mb-3 block text-sm text-dark dark:text-white"
-                    >
-                      {" "}
-                      Last Name{" "}
-                    </label>
-                    <input
-                      type="text"
-                      name="last_name"
-                      placeholder="Enter your Last Name"
-                      className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-sm border bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-                    />
-                  </div>
-                  <div className="mb-8">
-                    <label
-                      htmlFor="email"
-                      className="mb-3 block text-sm text-dark dark:text-white"
-                    >
-                      {" "}
-                      Your Email{" "}
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="Enter your Email"
-                      className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-sm border bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-                    />
-                  </div>
-                  <div className="mb-8">
-                    <label
-                      htmlFor="password"
-                      className="mb-3 block text-sm text-dark dark:text-white"
-                    >
-                      {" "}
-                      Your Password{" "}
-                    </label>
-                    <input
-                      type="password"
-                      name="password1"
-                      placeholder="Enter your Password"
-                      className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-sm border bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-                    />
-                  </div>
-                  <div className="mb-8">
-                    <label
-                      htmlFor="password"
-                      className="mb-3 block text-sm text-dark dark:text-white"
-                    >
-                      {" "}
-                      Please Retype Password{" "}
-                    </label>
-                    <input
-                      type="password"
-                      name="password2"
-                      placeholder="Enter your Password"
-                      className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-sm border bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-                    />
-                  </div>
-                  <div className="mb-8 flex">
-                    <label
-                      htmlFor="checkboxLabel"
-                      className="flex cursor-pointer select-none text-sm font-medium text-body-color"
-                    >
-                      <div className="relative">
-                        <input
-                          type="checkbox"
-                          id="checkboxLabel"
-                          className="sr-only"
-                        />
-                        <div className="box mr-4 mt-1 flex h-5 w-5 items-center justify-center rounded border border-body-color border-opacity-20 dark:border-white dark:border-opacity-10">
-                          <span className="opacity-0">
-                            <svg
-                              width="11"
-                              height="8"
-                              viewBox="0 0 11 8"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M10.0915 0.951972L10.0867 0.946075L10.0813 0.940568C9.90076 0.753564 9.61034 0.753146 9.42927 0.939309L4.16201 6.22962L1.58507 3.63469C1.40401 3.44841 1.11351 3.44879 0.932892 3.63584C0.755703 3.81933 0.755703 4.10875 0.932892 4.29224L0.932878 4.29225L0.934851 4.29424L3.58046 6.95832C3.73676 7.11955 3.94983 7.2 4.1473 7.2C4.36196 7.2 4.55963 7.11773 4.71406 6.9584L10.0468 1.60234C10.2436 1.4199 10.2421 1.1339 10.0915 0.951972ZM4.2327 6.30081L4.2317 6.2998C4.23206 6.30015 4.23237 6.30049 4.23269 6.30082L4.2327 6.30081Z"
-                                fill="#3056D3"
-                                stroke="#3056D3"
-                                strokeWidth="0.4"
-                              />
-                            </svg>
-                          </span>
-                        </div>
-                      </div>
-                      <span>
-                        By creating account means you agree to the
-                        <a href="#0" className="text-primary hover:underline">
-                          {" "}
-                          Terms and Conditions{" "}
-                        </a>
-                        , and our
-                        <a href="#0" className="text-primary hover:underline">
-                          {" "}
-                          Privacy Policy{" "}
-                        </a>
-                      </span>
-                    </label>
-                  </div>
-                  <div className="mb-6">
-                    <button className="shadow-submit dark:shadow-submit-dark flex w-full items-center justify-center rounded-sm bg-primary px-9 py-4 text-base font-medium text-white duration-300 hover:bg-primary/90">
-                      Sign up
-                    </button>
-                  </div>
-                </form>
-                <p className="text-center text-base font-medium text-body-color">
-                  Already using Mazu?{" "}
-                  <Link href="/sign-in" className="text-primary hover:underline">
-                    Sign in
-                  </Link>
-                </p>
+                ))}
+                <div className="mb-8">
+                  <label htmlFor="industry" className="mb-3 block text-sm text-dark dark:text-white">
+                    Industry
+                  </label>
+                  <select
+                    name="industry"
+                    id="industry"
+                    required
+                    value={userDetails.industry}
+                    onChange={handleChange}
+                    className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-sm border bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
+                  >
+                    <option value="">Select Industry</option>
+                    {industryOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="mb-8">
+                  <label htmlFor="description" className="mb-3 block text-sm text-dark dark:text-white">
+                    Description
+                  </label>
+                  <textarea
+                    name="description"
+                    id="description"
+                    required
+                    placeholder="Enter your company description"
+                    value={userDetails.description}
+                    onChange={handleChange}
+                    spellCheck="true"
+                    className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-sm border bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full rounded bg-primary py-3 text-base font-semibold text-white transition-all duration-300 hover:bg-opacity-90"
+                >
+                  Sign Up
+                </button>
+              </form>
+              <div className="mt-6 text-center text-base font-medium text-body-color">
+                Already have an account? <Link href="/sign-in" className="text-primary">Sign In</Link>
               </div>
             </div>
           </div>
         </div>
-        <div className="absolute left-0 top-0 z-[-1]">
-          <svg
-            width="1440"
-            height="969"
-            viewBox="0 0 1440 969"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <mask
-              id="mask0_95:1005"
-              style={{ maskType: "alpha" }}
-              maskUnits="userSpaceOnUse"
-              x="0"
-              y="0"
-              width="1440"
-              height="969"
-            >
-              <rect width="1440" height="969" fill="#090E34" />
-            </mask>
-            <g mask="url(#mask0_95:1005)">
-              <path
-                opacity="0.1"
-                d="M1086.96 297.978L632.959 554.978L935.625 535.926L1086.96 297.978Z"
-                fill="url(#paint0_linear_95:1005)"
-              />
-              <path
-                opacity="0.1"
-                d="M1324.5 755.5L1450 687V886.5L1324.5 967.5L-10 288L1324.5 755.5Z"
-                fill="url(#paint1_linear_95:1005)"
-              />
-            </g>
-            <defs>
-              <linearGradient
-                id="paint0_linear_95:1005"
-                x1="1178.4"
-                y1="151.853"
-                x2="780.959"
-                y2="453.581"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop stopColor="#4A6CF7" />
-                <stop offset="1" stopColor="#4A6CF7" stopOpacity="0" />
-              </linearGradient>
-              <linearGradient
-                id="paint1_linear_95:1005"
-                x1="160.5"
-                y1="220"
-                x2="1099.45"
-                y2="1192.04"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop stopColor="#4A6CF7" />
-                <stop offset="1" stopColor="#4A6CF7" stopOpacity="0" />
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 };
 
-export default SignupPage;
+export default Signup;

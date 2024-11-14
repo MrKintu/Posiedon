@@ -6,6 +6,8 @@
  */
 
 "use client";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -35,6 +37,18 @@ const LinkItem = ({ href, children }) => (
 );
 
 const Footer = () => {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    // Set state to true when client-side rendering
+    setIsClient(true);
+  }, []);
+
+  // Return a loading state or null during SSR to avoid hydration mismatch
+  if (!isClient) {
+    return null;
+  }
+
   return (
     <footer className="bg-main-bg dark:bg-main-dark-bg pt-16 md:pt-20 lg:pt-24">
       <div className="container mx-auto"> {/* Added mx-auto for centering */}

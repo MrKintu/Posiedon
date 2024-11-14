@@ -1,7 +1,17 @@
+/*
+ * Created Date: Saturday, September 14th 2024, 2:14:37 am
+ * Author: Kintu Declan Trevor
+ * 
+ * Copyright (c) 2024 Kintu Declan Trevor
+ */
+
+"use client"
+
 import { useEffect, useState } from "react";
 
 export default function ScrollToTop() {
   const [isVisible, setIsVisible] = useState(false);
+  const [isClient, setIsClient] = useState(false); // To check for client-side rendering
 
   // Top: 0 takes us all the way back to the top of the page
   // Behavior: smooth keeps it smooth!
@@ -13,7 +23,10 @@ export default function ScrollToTop() {
   };
 
   useEffect(() => {
-    // Button is displayed after scrolling for 500 pixels
+    // Ensuring this effect runs only on the client side
+    setIsClient(true);
+
+    // Button is displayed after scrolling for 300 pixels
     const toggleVisibility = () => {
       if (window.pageYOffset > 300) {
         setIsVisible(true);
@@ -26,6 +39,8 @@ export default function ScrollToTop() {
 
     return () => window.removeEventListener("scroll", toggleVisibility);
   }, []);
+
+  if (!isClient) return null; // Prevent server-side rendering issues
 
   return (
     <div className="fixed bottom-8 right-8 z-[99]">

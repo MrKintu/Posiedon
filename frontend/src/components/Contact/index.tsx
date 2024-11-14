@@ -7,13 +7,23 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ContactList from "@/components/ContactList";
 import ConversationWindow from "@/components/ConversationWindow";
 import SearchBar from "@/components/SearchBar";
 
 const Contact = () => {
   const [selectedContact, setSelectedContact] = useState(null);
+  const [isClient, setIsClient] = useState(false)
+
+  // This effect ensures the component is only rendered on the client-side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return null; // Return nothing until after the first render on the client-side
+  }
 
   return (
     <section id="contact" className="overflow-hidden py-16 md:py-20 lg:py-28">

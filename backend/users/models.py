@@ -24,51 +24,29 @@ def rename_image(instance, filename):
     return new_path
 
 
-# User Information model
-class UserInfo(models.Model):
-    title_choices = (
-        ("Mr", "Mr"),
-        ("Mrs", "Mrs"),
-        ("Ms", "Ms"),
-    )
-
-    gender_choices = (
-        ("Male", "Male"),
-        ("Female", "Female"),
-    )
-
-    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
-    title = models.CharField(max_length=10, choices=title_choices, null=True)
-    gender = models.CharField(max_length=10, choices=gender_choices, null=True)
-    d_o_b = models.DateField(null=True)
-    phone = models.PositiveBigIntegerField(null=True, unique=True)
-
-    def __str__(self):
-        return str(self.phone)
-
-
-# Customer model
 class Customer(models.Model):
-    industry_choices = (
-        (0, "Transportation"),
-        (1, "Pharmaceutical"),
-        (2, "Telecommunications"),
-        (3, "Manufacturing"),
-        (4, "Mining"),
-        (5, "Hospitality"),
-        (6, "Media and News"),
-        (7, "Agriculture"),
-        (8, "Computer and Technology"),
-        (9, "Education"),
-        (10, "Finance and Economics"),
-        (11, "Health Care")
-    )
+    INDUSTRY_CHOICES = [
+        ("Transportation", "Transportation"),
+        ("Pharmaceutical", "Pharmaceutical"),
+        ("Telecommunications", "Telecommunications"),
+        ("Manufacturing", "Manufacturing"),
+        ("Mining", "Mining"),
+        ("Hospitality", "Hospitality"),
+        ("Media and News", "Media and News"),
+        ("Agriculture", "Agriculture"),
+        ("Engineering and Technology", "Engineering and Technology"),
+        ("Education", "Education"),
+        ("Finance and Economics", "Finance and Economics"),
+        ("Health Care", "Health Care"),
+    ]
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
-    customer_id = models.CharField(max_length=10, null=True, blank=True, unique=True)
+    customer_id = models.CharField(max_length=10, unique=True, null=True, blank=True)
     business = models.CharField(max_length=100, null=True, blank=True)
+    years = models.IntegerField(null=True)
+    phone = models.PositiveBigIntegerField(null=True, unique=True)
     description = models.TextField(null=True)
-    industry = models.CharField(max_length=100, blank=True, null=True, choices=industry_choices) # type: ignore
+    industry = models.CharField(max_length=100, choices=INDUSTRY_CHOICES, blank=True, null=True) # type: ignore
     city = models.CharField(max_length=100, null=True, blank=True)
     state = models.CharField(max_length=100, null=True, blank=True)
     country = models.CharField(max_length=100, null=True, blank=True)
@@ -77,12 +55,19 @@ class Customer(models.Model):
         return self.customer_id
 
 
-# Marketer model
-class Marketer(models.Model):
+class Staff(models.Model):
+    DIVISION_TYPES = [
+        ("Content Creation and Strategy", "Content Creation and Strategy"),
+        ("Marketing and Advertising Services", "Marketing and Advertising Services"), 
+        ("Branding and Identity Services", "Branding and Identity Services"),  
+        ("E-Commerce Solutions", "E-Commerce Solutions")
+    ]
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
-    staff_id = models.CharField(max_length=10, null=True, blank=True, unique=True)
+    staff_id = models.CharField(max_length=10, unique=True, null=True, blank=True)
+    division = models.CharField(max_length=50, choices=DIVISION_TYPES, null=True) # type: ignore
+    phone = models.PositiveBigIntegerField(null=True, unique=True)
     profile_image = models.ImageField(upload_to=rename_image, null=True)
-    customers = models.ManyToManyField(Customer, blank=True, related_name='marketer_customers')
+    customers = models.ManyToManyField(Customer, blank=True, related_name='staff_customers')
     is_admin = models.BooleanField(default=False)
 
     def __str__(self):

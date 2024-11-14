@@ -7,71 +7,78 @@
 
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStateContext } from '@/contexts/ContextProvider';
 
 const ChatPage = () => {
   const { currentMode } = useStateContext();
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<(string | File)[]>([]); // Allow messages to store either text or files
-  const [selectedFile, setSelectedFile] = useState<File | null>(null); // To store the selected file
+  const [messages, setMessages] = useState<(string | File)[]>([]);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isClient, setIsClient] = useState(false); // State to check if it's running on the client side
 
-  // Handle sending messages by clicking the button or pressing 'Enter'
+  useEffect(() => {
+    setIsClient(true); // Set isClient to true once the component is mounted on the client
+  }, []);
+
   const handleSendClick = () => {
     if (input.trim() || selectedFile) {
-      setMessages([...messages, selectedFile ? selectedFile : input]); // Add file or input to messages
-      setInput(''); // Clear the input field
-      setSelectedFile(null); // Clear selected file
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        selectedFile ? selectedFile : input,
+      ]);
+      setInput('');
+      setSelectedFile(null);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      handleSendClick(); // Trigger send on Enter key press
+      handleSendClick();
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]; // Get the first selected file
-    setSelectedFile(file || null); // Set the file or null if no file is selected
+    const file = e.target.files?.[0];
+    setSelectedFile(file || null);
   };
+
+  if (!isClient) {
+    return null; // Return nothing during SSR
+  }
 
   return (
     <div className={`chat-page ${currentMode === 'dark' ? 'dark-theme' : 'light-theme'}`}>
       <div className="main-content">
-        {/* ChatContainer to display the messages */}
         <div className="chat-box">
           {messages.map((msg, idx) => (
             <div key={idx} className="chat-message">
               {typeof msg === 'string' ? (
-                msg // Display text message
+                msg
               ) : (
                 <a href={URL.createObjectURL(msg)} target="_blank" rel="noopener noreferrer">
-                  {msg.name} {/* Display file name */}
+                  {msg.name}
                 </a>
               )}
             </div>
           ))}
         </div>
 
-        {/* Chat Input Section */}
         <div className="chat-input">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown} // Add onKeyDown listener for 'Enter' key
+            onKeyDown={handleKeyDown}
             placeholder="Type your message..."
             className="text-black p-2 border border-gray-300 rounded"
           />
-          
-          {/* Attachment Button */}
           <label className="attachment-button">
-            📎 {/* Icon for the attachment button */}
+            📎
             <input
               type="file"
               onChange={handleFileChange}
-              style={{ display: 'none' }} // Hide default file input
+              style={{ display: 'none' }}
             />
           </label>
 
@@ -84,7 +91,7 @@ const ChatPage = () => {
           display: flex;
           flex-direction: column;
           flex: 1;
-          padding-top: 20px; /* Added padding to ensure it's spaced from navbar */
+          padding-top: 20px;
         }
         .main-content {
           display: flex;

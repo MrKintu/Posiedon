@@ -5,8 +5,11 @@
  * Copyright (c) 2024 Kintu Declan Trevor
  */
 
+'use client';
+
 import Image from "next/image";
 import SectionTitle from "../Common/SectionTitle";
+import { useState, useEffect } from "react";
 
 const checkIcon = (
   <svg width="16" height="13" viewBox="0 0 16 13" className="fill-current">
@@ -15,7 +18,13 @@ const checkIcon = (
 );
 
 const AboutSectionOne = () => {
-  const List = ({ text }) => (
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true); // Wait until the client-side renders
+  }, []);
+
+  const List = ({ text }: { text: string }) => (
     <p className="mb-5 flex items-center text-lg font-medium text-body-color">
       <span className="mr-4 flex h-[30px] w-[30px] items-center justify-center rounded-md bg-primary bg-opacity-10 text-primary">
         {checkIcon}
@@ -23,6 +32,8 @@ const AboutSectionOne = () => {
       {text}
     </p>
   );
+
+  if (!isClient) return <div>Loading...</div>; // Ensure server-side rendering doesn't affect layout
 
   return (
     <section id="about" className="pt-16 md:pt-20 lg:pt-28">

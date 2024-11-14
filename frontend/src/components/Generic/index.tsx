@@ -5,11 +5,26 @@
  * Copyright (c) 2024 Kintu Declan Trevor
  */
 
+"use client";
+
+import { useEffect, useState } from "react";
 import SectionTitle from "../Common/SectionTitle";
 import SingleBlog from "./SingleGeneric";
 import blogData from "./genericData";
 
 const Generic = () => {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    // Set state to true when client-side rendering
+    setIsClient(true);
+  }, []);
+
+  // Return a loading state or null during SSR to avoid hydration mismatch
+  if (!isClient) {
+    return null;
+  }
+
   return (
     <section
       id="blog"

@@ -7,10 +7,19 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const SearchBar = () => {
   const [search, setSearch] = useState("");
+  const [isClient, setIsClient] = useState(false); // For client-side rendering check
+
+  // Set isClient to true when the component has mounted on the client side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Prevent rendering on the server side to address hydration issues
+  if (!isClient) return null;
 
   return (
     <div className="flex items-center p-4">

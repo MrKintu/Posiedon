@@ -5,7 +5,9 @@
  * Copyright (c) 2024 Kintu Declan Trevor
  */
 
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import { MdOutlineCancel } from "react-icons/md";
 import { BsCheck } from "react-icons/bs";
 import { FiSettings } from "react-icons/fi"; // Icon for settings button
@@ -28,6 +30,16 @@ const ThemeSettings: React.FC = () => {
     activeThemeSettings,
     setActiveThemeSettings,
   } = useStateContext();
+
+  const [isClient, setIsClient] = useState(false);
+
+  // Ensure the component renders only on the client-side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Render nothing on the server
+  if (!isClient) return null;
 
   return (
     <div>
@@ -111,9 +123,7 @@ const ThemeSettings: React.FC = () => {
                         className="w-10 h-10 rounded-full flex justify-center items-center cursor-pointer"
                       >
                         <BsCheck
-                          className={`text-3xl text-white ${
-                            col.color === themeColor ? "block" : "hidden"
-                          }`}
+                          className={`text-3xl text-white ${col.color === themeColor ? "block" : "hidden"}`}
                         />
                       </button>
                     </div>

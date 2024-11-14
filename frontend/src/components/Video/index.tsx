@@ -7,14 +7,21 @@
 
 "use client";
 
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { useState } from "react";
 import SectionTitle from "../Common/SectionTitle";
-
 import ModalVideo from "react-modal-video";
 
 const Video = () => {
   const [isOpen, setOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  // Ensure the component only renders on the client-side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) return null; // Prevent rendering on the server side
 
   return (
     <section className="relative z-10 py-16 md:py-20 lg:py-28">

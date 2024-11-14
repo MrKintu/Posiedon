@@ -7,13 +7,25 @@
 
 "use client";
 
-const ContactList = ({ setSelectedContact }) => {
+import { useState, useEffect } from "react";
+
+const ContactList = ({ setSelectedContact }: { setSelectedContact: (contact: any) => void }) => {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true); // Set to true after the component mounts on the client side
+  }, []);
+
   const contacts = [
     { name: "Faithful Black Mer", lastMessage: "All love brother 👊🏿", date: "Oct 7, 2021" },
     { name: "sizzy", lastMessage: "You shared a post", date: "Oct 6, 2021" },
     { name: "Big Quando", lastMessage: "Tonnes of peace of mind", date: "Oct 5, 2021" },
     { name: "Absa Bank Ug", lastMessage: "Okay. Thank you", date: "Sep 16, 2020" },
   ];
+
+  if (!isClient) {
+    return null; // Prevent rendering before the client-side hydration
+  }
 
   return (
     <div>

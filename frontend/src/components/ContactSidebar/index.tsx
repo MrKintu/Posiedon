@@ -6,7 +6,7 @@
  */
 
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SearchBar from "@/components/SearchBar";
 
 interface Contact {
@@ -20,6 +20,13 @@ interface ContactSidebarProps {
 }
 
 const ContactSidebar: React.FC<ContactSidebarProps> = ({ onSelectUser }) => {
+  const [isClient, setIsClient] = useState(false);
+
+  // Set isClient to true after the component mounts on the client
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   // Sample contact list; replace with dynamic data if needed
   const [contacts] = useState<Contact[]>([
     { id: 1, name: "Faithful Black Mer", lastMessage: "All love brother 👊🏾" },
@@ -35,6 +42,10 @@ const ContactSidebar: React.FC<ContactSidebarProps> = ({ onSelectUser }) => {
   const filteredContacts = contacts.filter(contact =>
     contact.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (!isClient) {
+    return null; // Prevent rendering until client-side hydration is complete
+  }
 
   return (
     <div>
@@ -61,4 +72,3 @@ const ContactSidebar: React.FC<ContactSidebarProps> = ({ onSelectUser }) => {
 };
 
 export default ContactSidebar;
-

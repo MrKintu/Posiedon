@@ -6,9 +6,8 @@ Copyright (c) 2024 Kintu Declan Trevor
 '''
 
 from django.contrib import admin
-from .models import Customer, Marketer, UserInfo
+from .models import Customer, Staff
 
 
 admin.site.register(Customer)
-admin.site.register(Marketer)
-admin.site.register(UserInfo)
+admin.site.register(Staff)

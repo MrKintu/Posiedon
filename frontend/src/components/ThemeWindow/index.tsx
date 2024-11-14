@@ -5,20 +5,28 @@
  * Copyright (c) 2024 Kintu Declan Trevor
  */
 
-import React from "react";
-import SettingIcon from "@/components/SettingIcon";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import ThemeSettings from "@/components/ThemeSettings";
 import { useStateContext } from "@/contexts/ContextProvider";
 
 const ThemeWindow: React.FC = () => {
-	const { activeThemeSettings } = useStateContext();
+  const { activeThemeSettings } = useStateContext();
+  const [isClient, setIsClient] = useState(false);
 
-	return (
-		<>
-			<SettingIcon />
-			{activeThemeSettings && <ThemeSettings />}
-		</>
-	);
+  // Ensure that the component renders only on the client-side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) return null; // Prevent rendering on the server side
+
+  return (
+    <>
+      {activeThemeSettings && <ThemeSettings />}
+    </>
+  );
 };
 
 export default ThemeWindow;

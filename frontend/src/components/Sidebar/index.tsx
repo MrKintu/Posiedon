@@ -5,7 +5,9 @@
  * Copyright (c) 2024 Kintu Declan Trevor
  */
 
-import React, { useEffect } from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SiShopware } from "react-icons/si";
@@ -16,6 +18,7 @@ import { useStateContext } from "@/contexts/ContextProvider";
 
 interface LinkItem {
   name: string;
+  path: string;
   icon: JSX.Element;
 }
 
@@ -26,28 +29,27 @@ interface Category {
 
 const Sidebar: React.FC = () => {
   const { themeColor, activeMenu, setActiveMenu, screenSize, toggleMenu } = useStateContext();
-  const [mounted, setMounted] = React.useState(false);
+  const [mounted, setMounted] = useState(false);
+  const router = usePathname(); 
 
-  // Set default Sidebar state to closed (false) regardless of screen size
+  // Hydration: Ensure component renders only on the client
   useEffect(() => {
-    setActiveMenu(false);  // Ensure menu is closed by default
     setMounted(true);
-  }, [setActiveMenu]);
+  }, []);
 
   useEffect(() => {
-    // Ensure sidebar is only opened manually and doesn't pop up on larger screens
+    if (!mounted) return; // Ensure this runs only after mounting
     const storedActiveMenu = localStorage.getItem("activeMenu");
     if (storedActiveMenu !== null) {
-      setActiveMenu(JSON.parse(storedActiveMenu));  // Load saved state
+      setActiveMenu(JSON.parse(storedActiveMenu));
     }
-  }, [setActiveMenu]);
+  }, [mounted, setActiveMenu]);
 
-  // Update localStorage whenever 'activeMenu' state changes
   useEffect(() => {
-    localStorage.setItem("activeMenu", JSON.stringify(activeMenu));
-  }, [activeMenu]);
-
-  if (!mounted) return null;  // Avoid rendering before mounting
+    if (mounted) {
+      localStorage.setItem("activeMenu", JSON.stringify(activeMenu));
+    }
+  }, [activeMenu, mounted]);
 
   // Close Sidebar on smaller screens or when manually closed
   const handleCloseSidebar = () => {
@@ -59,7 +61,7 @@ const Sidebar: React.FC = () => {
   const activeLink = "flex items-center gap-5 pl-4 pt-3 pb-2.5 rounded-lg text-md m-2 text-white";
   const normalLink = "flex items-center gap-5 pl-4 pt-3 pb-2.5 rounded-lg text-md text-gray-700 dark:text-gray-200 dark:hover:text-black hover:bg-light-gray m-2";
 
-  const router = usePathname();
+  if (!mounted) return null;  // Avoid rendering before mounted
 
   return (
     <div className={activeMenu ? "w-72 fixed top-0 left-0 h-full sidebar dark:bg-secondary-dark-bg bg-white z-50" : "hidden"}>
