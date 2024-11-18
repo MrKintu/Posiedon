@@ -9,60 +9,91 @@
 
 import React, { useState, useEffect } from "react";
 import { useStateContext } from "@/contexts/ContextProvider";
-import {
-  GridComponent,
-  ColumnsDirective,
-  ColumnDirective,
-  Page,
-  Inject,
-  Toolbar,
-  Sort,
-  Edit,
-} from "@syncfusion/ej2-react-grids";
 import { Header } from "@/components";
-import { customersData, customersGrid } from "public/data/dummy";
+import { DataTable } from "@/components/DataTable";
+import { subscriptionsData } from "public/data/dummy";
+import { createColumnHelper } from "@tanstack/react-table";
 
-const CustomersPage: React.FC = () => {
-  const { activeMenu } = useStateContext();
-  const [isClient, setIsClient] = useState(false); // State to track if it's client-side rendering
+// Define the Subscription type based on your data structure
+type Subscription = {
+  SubscriptionID: number;
+  CustomerName: string;
+  Plan: string;
+  Status: string;
+  StatusBg: string;
+  StartDate: string;
+  EndDate: string;
+  Amount: number;
+};
+
+const SubscriptionsPage: React.FC = () => {
+  const { currentMode } = useStateContext();
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true); // Set to true once the component has mounted on the client
+    setIsClient(true);
   }, []);
 
-  // Prevent rendering Syncfusion Grid before client-side mounting
-  if (!isClient) {
-    return null; // Optionally render a loading spinner or placeholder
-  }
+  if (!isClient) return null;
+
+  const columnHelper = createColumnHelper<Subscription>();
+
+  const columns = [
+    columnHelper.accessor("SubscriptionID", {
+      header: "ID",
+      cell: info => info.getValue(),
+    }),
+    columnHelper.accessor("CustomerName", {
+      header: "Customer",
+      cell: info => info.getValue(),
+    }),
+    columnHelper.accessor("Plan", {
+      header: "Plan",
+      cell: info => info.getValue(),
+    }),
+    columnHelper.accessor("StartDate", {
+      header: "Start Date",
+      cell: info => new Date(info.getValue()).toLocaleDateString(),
+    }),
+    columnHelper.accessor("EndDate", {
+      header: "End Date",
+      cell: info => new Date(info.getValue()).toLocaleDateString(),
+    }),
+    columnHelper.accessor("Amount", {
+      header: "Amount",
+      cell: info => `$${info.getValue().toFixed(2)}`,
+    }),
+    columnHelper.accessor("Status", {
+      header: "Status",
+      cell: info => (
+        <div className="flex items-center">
+          <div
+            className="w-2.5 h-2.5 rounded-full mr-2"
+            style={{ backgroundColor: info.row.original.StatusBg }}
+          />
+          {info.getValue()}
+        </div>
+      ),
+    }),
+  ];
 
   return (
-    <div className={activeMenu ? "md:ml-72" : "w-full flex-2"}>
-      <div className="m-2 md:m-10 py-4 px-2 md:p-10 bg-white rounded-3xl dark:text-gray-200 dark:bg-secondary-dark-bg">
-        <Header title={"Customers"} category={"Page"} />
-        <GridComponent
-          dataSource={customersData}
-          allowPaging
-          allowSorting
-          toolbar={["Add", "Edit", "Delete", "Update", "Cancel"]}
-          width={"auto"}
-          selectionSettings={{ type: "Multiple", mode: "Row" }}
-          editSettings={{
-            allowEditing: true,
-            allowAdding: true,
-            allowDeleting: true,
-            mode: "Dialog",
-          }}
-        >
-          <ColumnsDirective>
-            {customersGrid.map((item, index) => (
-              <ColumnDirective key={index} {...item} />
-            ))}
-          </ColumnsDirective>
-          <Inject services={[Page, Toolbar, Sort, Edit]} />
-        </GridComponent>
+    <div className={currentMode === "Dark" ? "m-2 md:m-10 p-2 md:p-10 bg-secondary-dark-bg dark:text-gray-200 rounded-3xl" : "m-2 md:m-10 p-2 md:p-10 bg-white rounded-3xl"}>
+      <Header category="Page" title="Subscriptions" />
+      <div className="w-full">
+        <DataTable
+          data={subscriptionsData}
+          columns={columns}
+          enableSorting={true}
+          enablePagination={true}
+          showSearch={true}
+          darkMode={currentMode === 'Dark'}
+          enableColumnFilters={true}
+          enableColumnVisibility={true}
+        />
       </div>
     </div>
   );
 };
 
-export default CustomersPage;
+export default SubscriptionsPage;

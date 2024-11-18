@@ -12,56 +12,93 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ApiClient from "@/utilities/api_client";
 import { useAuthContext } from "@/contexts/AuthContext";
+import { secureStorage, sanitizeInput, isTokenExpired, rateLimit } from "@/utils/auth";
 
 const Signin = () => {
   const [isClient, setIsClient] = useState(false);
-  const { setAuthContext } = useAuthContext();  // Destructure setAuthContext from context
+  const { setAuthContext } = useAuthContext();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const checkRateLimit = rateLimit();
 
   useEffect(() => {
-    // Hydration fix: ensure the component renders only on the client
     setIsClient(true);
-  }, []);
+    // Check for existing token on mount
+    const existingToken = secureStorage.getItem("access_token");
+    if (existingToken && !isTokenExpired(existingToken)) {
+      router.push('/customers');
+    }
+  }, [router]);
 
-  // Hydration fix: render the component only when on the client
   if (!isClient) return null;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    try {
-      // Post data to the sign-in endpoint
-      const response = await ApiClient.post("users/sign-in/", { email, password });
+    // Sanitize inputs
+    const sanitizedEmail = sanitizeInput(email);
+    
+    // Check rate limiting
+    const userIdentifier = sanitizedEmail || 'anonymous';
+    if (!checkRateLimit(userIdentifier)) {
+      setError("Too many login attempts. Please try again later.");
+      return;
+    }
 
-      // Check for any errors in the response
-      if (response.error) {
-        setError("Invalid username or password.");
+    try {
+      const signInResponse = await ApiClient.post("users/sign-in/", { 
+        email: sanitizedEmail, 
+        password  // password is not sanitized as it might contain special characters
+      });
+
+      if (signInResponse.error) {
+        console.error("Sign in error:", signInResponse.error);
+        const errorMessage = typeof signInResponse.error === 'object' && signInResponse.error !== null
+          ? signInResponse.error.detail || "An error occurred during sign in"
+          : typeof signInResponse.error === 'string'
+            ? signInResponse.error
+            : "Invalid email or password";
+        setError(errorMessage);
         return;
       }
 
-      // Extract the tokens and username from the response
-      const { access, refresh, username } = response;
-      console.log("Logged in successfully:", response);
+      try {
+        const { access, refresh, user } = signInResponse;
+        if (!access || !refresh || !user) {
+          console.error("Missing required auth data:", signInResponse);
+          setError("Invalid response from server");
+          return;
+        }
 
-      // Store the tokens in local storage
-      localStorage.setItem("access_token", access);
-      localStorage.setItem("refresh_token", refresh);
+        // Validate token before storing
+        if (isTokenExpired(access)) {
+          setError("Invalid token received from server");
+          return;
+        }
 
-      // Update the authentication context to reflect the successful login
-      setAuthContext({ isLoggedIn: true, username });  // This updates the context
+        // Store tokens securely
+        secureStorage.setItem("access_token", access);
+        secureStorage.setItem("refresh_token", refresh);
+        secureStorage.setItem("user_data", user);
+        
+        // Update auth context with user data
+        setAuthContext({
+          isLoggedIn: true,
+          username: user.username,
+          userData: user
+        });
 
-      // Set success message
-      setSuccessMessage("Sign-in successful! Redirecting to your account...");
-
-      // Redirect to the customer's page using the username
-      setTimeout(() => router.push(`/customers/${username}`), 2000);
+        setSuccessMessage("Sign-in successful! Redirecting to your account...");
+        setTimeout(() => router.push('/customers'), 2000);
+      } catch (parseError) {
+        console.error("Error parsing sign in response:", parseError);
+        setError("There was a problem processing your sign in. Please try again.");
+      }
     } catch (err) {
-      // Handle any errors during the request
       setError("An error occurred. Please try again later.");
       console.error(err);
     }
@@ -99,12 +136,10 @@ const Signin = () => {
                   <input
                     type="email"
                     name="email"
-                    id="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    required
                     placeholder="Enter your Email"
-                    className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-sm border bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
+                    className="w-full rounded-sm border border-stroke bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:text-body-color-dark dark:shadow-two dark:focus:border-primary dark:focus:shadow-none"
                   />
                 </div>
 
@@ -118,31 +153,38 @@ const Signin = () => {
                   <input
                     type="password"
                     name="password"
-                    id="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    required
                     placeholder="Enter your Password"
-                    className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-sm border bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
+                    className="w-full rounded-sm border border-stroke bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:text-body-color-dark dark:shadow-two dark:focus:border-primary dark:focus:shadow-none"
                   />
                 </div>
 
+                <div className="mb-8 flex flex-col justify-between sm:flex-row sm:items-center">
+                  <div className="mb-4 sm:mb-0">
+                    <Link
+                      href="/forgot-password"
+                      className="text-sm text-primary hover:underline"
+                    >
+                      Forgot Password?
+                    </Link>
+                  </div>
+                  <div>
+                    <Link
+                      href="/sign-up"
+                      className="text-sm text-primary hover:underline"
+                    >
+                      Create an Account
+                    </Link>
+                  </div>
+                </div>
+
                 <div className="mb-6">
-                  <button
-                    type="submit"
-                    className="shadow-submit dark:shadow-submit-dark flex w-full items-center justify-center rounded-sm bg-primary px-9 py-4 text-base font-medium text-white duration-300 hover:bg-primary/90"
-                  >
+                  <button className="flex w-full items-center justify-center rounded-sm bg-primary px-9 py-4 text-base font-medium text-white shadow-submit duration-300 hover:bg-primary/90 dark:shadow-submit-dark">
                     Sign in
                   </button>
                 </div>
               </form>
-
-              <p className="text-center text-base font-medium text-body-color">
-                Don’t you have an account?{" "}
-                <Link href="/signup" className="text-primary hover:underline">
-                  Sign up
-                </Link>
-              </p>
             </div>
           </div>
         </div>

@@ -5,11 +5,9 @@
  * Copyright (c) 2024 Kintu Declan Trevor
  */
 
-"use client";
-
-import { useState, useEffect } from "react";
 import { builder } from "@builder.io/sdk";
-import { RenderBuilderContent } from "../../components/builder";
+import { RenderContent } from "@/components/builder";
+import { Metadata } from "next";
 
 // Builder Public API Key set in .env file
 builder.init(process.env.NEXT_PUBLIC_BUILDER_API_KEY!);
@@ -18,54 +16,52 @@ interface PageProps {
   params: {
     page: string[];
   };
-  content: any; // Type this according to your expected content structure
 }
 
-export default function Page({ params, content }: PageProps) {
-  const { page } = params;
+export default async function Page({ params }: PageProps) {
+  const page = Array.isArray(params?.page) ? params.page : [];
+  const urlPath = '/' + page.join('/');
 
-  const [isClient, setIsClient] = useState(false);
-
-  // Hydration: Set the client state to true after mounting
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  // Don't render Builder content until the component is mounted (client-side)
-  if (!isClient) {
-    return null;
-  }
+  const content = await builder
+    .get('page', {
+      userAttributes: {
+        urlPath,
+      },
+    })
+    .promise();
 
   return (
-    <>
-      {/* Render the Builder page */}
-      <RenderBuilderContent content={content} model="page" />
-    </>
+    <div>
+      <RenderContent content={content} />
+    </div>
   );
 }
 
-// Server-side fetch for page content (for static generation or SSR)
-export async function generateMetadata({ params }: { params: { page: string[] } }) {
-  const builderModelName = "page";
-  const { page } = params;
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const page = Array.isArray(params?.page) ? params.page : [];
+  const urlPath = '/' + page.join('/');
 
   const content = await builder
-    .get(builderModelName, {
+    .get('page', {
       userAttributes: {
-        urlPath: "/" + (page?.join("/") || ""),
+        urlPath,
       },
     })
-    .toPromise();
+    .promise();
 
   return {
-    title: content?.data?.title || "Default Title", // Modify as needed
-    description: content?.data?.description || "Default Description", // Modify as needed
+    title: content?.data?.title || 'Page',
+    description: content?.data?.description,
   };
 }
 
 export async function generateStaticParams() {
-  // Generate static paths if you're using static generation
-  return [
-    { page: ["some", "path"] }, // Add the paths here
-  ];
+  const pages = await builder.getAll('page', {
+    fields: 'data.url',
+    options: { noTargeting: true },
+  });
+
+  return pages.map((page) => ({
+    page: page.data?.url?.split('/').filter(Boolean) || [],
+  }));
 }

@@ -9,39 +9,51 @@
 
 import React, { useEffect, useState } from "react";
 import { useStateContext } from "@/contexts/ContextProvider";
+import { FiSettings } from "react-icons/fi";
+import { BsSun, BsMoon } from "react-icons/bs";
+import { useTheme } from 'next-themes';
 
 const ThemeToggler: React.FC = () => {
-  const { currentMode, setMode, setActiveThemeSettings } = useStateContext();
-  const [isClient, setIsClient] = useState(false);  // Manage client-side state
-
-  // Toggle between light and dark mode using the context
-  const toggleTheme = () => {
-    const newMode = currentMode === "dark" ? "light" : "dark";
-    setMode(newMode);  // Pass the string directly
-  };
-
-  // Toggle the Theme Settings panel
-  const openThemeSettings = () => {
-    setActiveThemeSettings(true);  // Set the theme settings panel to active
-  };
+  const { themeColor, setActiveThemeSettings } = useStateContext();
+  const [isClient, setIsClient] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
-    setIsClient(true); // Set client-side state to true once mounted
-  }, []);
+    setIsClient(true);
+    console.log('[ThemeToggler] Initial theme:', theme);
+  }, [theme]);
 
-  // Skip rendering during hydration issues
+  const handleThemeToggle = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    console.log('[ThemeToggler] Toggling theme from', theme, 'to', newTheme);
+    setTheme(newTheme);
+  };
+
   if (!isClient) return null;
 
   return (
-    <div className="flex items-center">
-      {/* Toggle between light and dark theme */}
-      <button onClick={toggleTheme} className="p-2 bg-gray-200 dark:bg-gray-800 rounded-full">
-        {currentMode === "dark" ? "🌙" : "☀️"}
+    <div className="flex items-center gap-2">
+      {/* Theme Mode Toggle */}
+      <button 
+        onClick={handleThemeToggle}
+        className="p-2 rounded-full hover:bg-light-gray dark:hover:bg-secondary-dark-bg transition-colors duration-200"
+        title={theme === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
+      >
+        {theme === 'dark' ? (
+          <BsSun className="text-lg text-yellow-500" />
+        ) : (
+          <BsMoon className="text-lg text-blue-700" />
+        )}
       </button>
 
-      {/* Button to open Theme Settings */}
-      <button onClick={openThemeSettings} className="ml-4 p-2 bg-gray-200 dark:bg-gray-800 rounded-full">
-        ⚙️
+      {/* Theme Settings Button */}
+      <button 
+        onClick={() => setActiveThemeSettings(true)}
+        className="p-2 rounded-full hover:bg-light-gray dark:hover:bg-secondary-dark-bg transition-colors duration-200"
+        style={{ color: themeColor }}
+        title="Theme Settings"
+      >
+        <FiSettings className="text-lg" />
       </button>
     </div>
   );

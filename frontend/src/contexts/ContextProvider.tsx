@@ -7,16 +7,15 @@
 
 "use client";
 
-import { createContext, useContext, useState, useEffect, useMemo, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from "react";
 
 interface StateContextType {
   activeMenu: boolean;
   setActiveMenu: React.Dispatch<React.SetStateAction<boolean>>;
-  toggleMenu: () => void;
   isClicked: typeof initialState;
   setIsClicked: React.Dispatch<React.SetStateAction<typeof initialState>>;
-  handleClick: (key: keyof typeof initialState) => void;
-  handleClosingClick: (key: keyof typeof initialState) => void;
+  handleClick: (clicked: keyof typeof initialState) => void;
+  handleClosingClick: (clicked: keyof typeof initialState) => void;
   screenSize: number | undefined;
   setScreenSize: React.Dispatch<React.SetStateAction<number | undefined>>;
   currentMode: string;
@@ -55,6 +54,7 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
   const [themeColor, setThemeColor] = useState("#FF5C8E");
   const [currentMode, setCurrentMode] = useState("light");
   const [activeThemeSettings, setActiveThemeSettings] = useState(false);
+  const [navButton, setNavButton] = useState(false);
 
   useEffect(() => {
     const savedThemeColor = localStorage.getItem("themeColor");
@@ -63,6 +63,14 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
     if (savedThemeColor) setThemeColor(savedThemeColor);
     if (savedThemeMode) setCurrentMode(savedThemeMode);
 
+    const handleResize = () => setScreenSize(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    handleResize();
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
     if (typeof window !== "undefined") {
       const handleResize = () => setScreenSize(window.innerWidth);
       window.addEventListener("resize", handleResize);
@@ -98,7 +106,7 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
   };
 
   const toggleMenu = () => {
-    setActiveMenu((prev) => {
+    setActiveMenu((prev: any) => {
       const newValue = !prev;
       localStorage.setItem("activeMenu", JSON.stringify(newValue));
       return newValue;
@@ -123,7 +131,9 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
     activeThemeSettings,
     setActiveThemeSettings,
     toggleMenu,
-  }), [activeMenu, isClicked, screenSize, currentMode, themeColor, activeThemeSettings]);
+    navButton,
+    setNavButton,
+  }), [activeMenu, isClicked, screenSize, currentMode, themeColor, activeThemeSettings, navButton]);
 
   return (
     <StateContext.Provider value={contextValue}>
@@ -132,4 +142,10 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
   );
 };
 
-export const useStateContext = () => useContext(StateContext);
+export const useStateContext = () => {
+  const context = useContext(StateContext);
+  if (context === undefined) {
+    throw new Error("useStateContext must be used within a ContextProvider");
+  }
+  return context;
+};

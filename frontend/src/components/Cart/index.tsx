@@ -5,6 +5,8 @@
  * Copyright (c) 2024 Kintu Declan Trevor
  */
 
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { useStateContext } from "@/contexts/ContextProvider";
 import { AiOutlineMinusSquare, AiOutlinePlusSquare } from "react-icons/ai";
@@ -25,67 +27,60 @@ const Cart: React.FC = () => {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true); // This ensures the component runs only on the client side
+    setIsClient(true);
   }, []);
 
-  if (!isClient) return null; // Ensure nothing is rendered on the server side
+  if (!isClient) return null;
 
   return (
-    <div className="bg-half-transparent w-screen fixed nav-item top-0 right-0">
-      <div className="float-right h-screen dark:text-gray-200 bg-white dark:bg-theme-bg w-full sm:w-400 p-8">
-        <SubHeading
-          text={"Shopping Cart"}
-          func={() => handleClosingClick("cart")}
-        />
+    <div className="nav-item absolute top-16 right-5 md:right-52 bg-white dark:bg-secondary-dark-bg p-8 rounded-lg w-96">
+      <SubHeading
+        text="Shopping Cart"
+        func={() => handleClosingClick("cart")}
+      />
 
-        <div className="flex flex-col">
-          {/* Type assertion to declare the cartData as CartItem[] */}
-          {(cartData as unknown as CartItem[]).map((item: CartItem, index: number) => (
-            <div
-              key={index}
-              className="border-b-1 border-color dark:border-gray-600 flex gap-4 justify-center items-center py-6 px-4"
-            >
-              <Image
-                src={item.image}
-                alt="product"
-                className="rounded-xl h-20 w-24"
-              />
-              <div className="flex-1">
-                <h3 className="font-semibold">{item.name}</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm font-semibold">
-                  {item.category}
-                </p>
-                <div className="flex mt-2 gap-4">
-                  <span className="font-semibold">{item.price}</span>
-                  <div className="flex gap-2 justify-center items-center">
-                    <AiOutlineMinusSquare className="text-red-600 text-2xl cursor-pointer" />
-                    <span>0</span>
-                    <AiOutlinePlusSquare className="text-green-600 text-2xl cursor-pointer" />
-                  </div>
+      <div className="flex flex-col">
+        {(cartData as CartItem[]).map((item, index) => (
+          <div
+            key={index}
+            className="flex items-center gap-4 border-b border-gray-200 dark:border-gray-600 py-4"
+          >
+            <Image
+              src={item.image}
+              alt={item.name}
+              width={96}
+              height={80}
+              className="rounded-xl object-cover"
+            />
+            <div className="flex-1">
+              <p className="font-semibold dark:text-gray-200">{item.name}</p>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                {item.category}
+              </p>
+              <div className="flex items-center gap-4 mt-2">
+                <p className="font-semibold dark:text-gray-200">{item.price}</p>
+                <div className="flex items-center gap-2">
+                  <button className="text-red-600 hover:text-red-700">
+                    <AiOutlineMinusSquare size={20} />
+                  </button>
+                  <span className="text-gray-600 dark:text-gray-400">1</span>
+                  <button className="text-green-600 hover:text-green-700">
+                    <AiOutlinePlusSquare size={20} />
+                  </button>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-
-        <div className="my-3">
-          <div className="flex gap-4 mt-4 justify-between mb-3">
-            <span className="text-gray-500 dark:text-gray-200">Sub Total</span>
-            <span className="font-semibold">$890</span>
           </div>
-          <div className="flex gap-4 mt-4 justify-between">
-            <span className="text-gray-500 dark:text-gray-200">Total</span>
-            <span className="font-semibold">$890</span>
-          </div>
-        </div>
+        ))}
+      </div>
 
+      <div className="mt-6">
         <Button
-          color={"white"}
-          text={"Place Order"}
-          borderRadius={"10px"}
-          size={"md"}
-          classes="w-full mt-5"
-          func={() => handleClosingClick("cart")}
+          text="Place Order"
+          bgColor="bg-blue-600"
+          color="text-white"
+          borderRadius="rounded-lg"
+          width="w-full"
         />
       </div>
     </div>

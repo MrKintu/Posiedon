@@ -16,12 +16,34 @@ if (!API_BASE_URL) {
   console.warn("API_BASE_URL is not defined. Please check your environment configuration.");
 }
 
+// Add auth token to requests if available
+const getAuthHeader = () => {
+  const token = localStorage.getItem('access_token');
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
+};
+
 const ApiClient = {
   async get<T = ApiResponse>(endpoint: string, params = {}): Promise<T> {
     try {
-      const response: AxiosResponse<T> = await axios.get(`${API_BASE_URL}${endpoint}`, { params });
+      const headers = getAuthHeader();
+      console.log('Request headers:', headers);
+      console.log('API URL:', `${API_BASE_URL}${endpoint}`);
+      const response: AxiosResponse<T> = await axios.get(`${API_BASE_URL}${endpoint}`, { 
+        params,
+        headers
+      });
+      console.log(`GET ${endpoint} response:`, response.data);
       return response.data;
     } catch (error) {
+      console.error(`GET ${endpoint} error:`, error);
+      if (error instanceof AxiosError) {
+        console.error('Error details:', {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+          headers: error.response?.headers
+        });
+      }
       const message = error instanceof AxiosError && error.response
         ? error.response.data
         : "An error occurred while fetching data.";
@@ -31,22 +53,60 @@ const ApiClient = {
 
   async post<T = ApiResponse>(endpoint: string, data = {}): Promise<T> {
     try {
-      const response: AxiosResponse<T> = await axios.post(`${API_BASE_URL}${endpoint}`, data);
+      console.log(`POST ${endpoint} request:`, data);
+      // Only add auth header if not signing in
+      const headers = endpoint === 'users/sign-in/' ? {} : getAuthHeader();
+      console.log('Request headers:', headers);
+      console.log('API URL:', `${API_BASE_URL}${endpoint}`);
+      
+      const response: AxiosResponse<T> = await axios.post(`${API_BASE_URL}${endpoint}`, data, {
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json',
+        }
+      });
+      console.log(`POST ${endpoint} response:`, response.data);
       return response.data;
     } catch (error) {
-      const message =
-        error instanceof AxiosError && error.response
-          ? JSON.stringify(error.response.data)
-          : "An error occurred while posting data.";
+      console.error(`POST ${endpoint} error:`, error);
+      if (error instanceof AxiosError) {
+        console.error('Error details:', {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+          headers: error.response?.headers
+        });
+      }
+      const message = error instanceof AxiosError && error.response
+        ? error.response.data
+        : "An error occurred while posting data.";
       return { error: message } as T;
     }
   },
 
   async put<T = ApiResponse>(endpoint: string, data = {}): Promise<T> {
     try {
-      const response: AxiosResponse<T> = await axios.put(`${API_BASE_URL}${endpoint}`, data);
+      const headers = getAuthHeader();
+      console.log('Request headers:', headers);
+      console.log('API URL:', `${API_BASE_URL}${endpoint}`);
+      const response: AxiosResponse<T> = await axios.put(`${API_BASE_URL}${endpoint}`, data, {
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json',
+        }
+      });
+      console.log(`PUT ${endpoint} response:`, response.data);
       return response.data;
     } catch (error) {
+      console.error(`PUT ${endpoint} error:`, error);
+      if (error instanceof AxiosError) {
+        console.error('Error details:', {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+          headers: error.response?.headers
+        });
+      }
       const message = error instanceof AxiosError && error.response
         ? error.response.data
         : "An error occurred while updating data.";
@@ -56,9 +116,24 @@ const ApiClient = {
 
   async delete<T = ApiResponse>(endpoint: string): Promise<T> {
     try {
-      const response: AxiosResponse<T> = await axios.delete(`${API_BASE_URL}${endpoint}`);
+      const headers = getAuthHeader();
+      console.log('Request headers:', headers);
+      console.log('API URL:', `${API_BASE_URL}${endpoint}`);
+      const response: AxiosResponse<T> = await axios.delete(`${API_BASE_URL}${endpoint}`, {
+        headers
+      });
+      console.log(`DELETE ${endpoint} response:`, response.data);
       return response.data;
     } catch (error) {
+      console.error(`DELETE ${endpoint} error:`, error);
+      if (error instanceof AxiosError) {
+        console.error('Error details:', {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+          headers: error.response?.headers
+        });
+      }
       const message = error instanceof AxiosError && error.response
         ? error.response.data
         : "An error occurred while deleting data.";

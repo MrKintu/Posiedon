@@ -5,71 +5,102 @@
  * Copyright (c) 2024 Kintu Declan Trevor
  */
 
-"use client";
+'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
-  ChartComponent,
-  SeriesCollectionDirective,
-  SeriesDirective,
-  Inject,
-  Legend,
-  Category,
-  StackingColumnSeries,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
   Tooltip,
-} from "@syncfusion/ej2-react-charts";
-import {
-  stackedCustomSeries,
-  stackedPrimaryXAxis,
-  stackedPrimaryYAxis,
-} from "public/data/dummy";
-import { useStateContext } from "@/contexts/ContextProvider";
+  Legend,
+  ResponsiveContainer
+} from 'recharts';
+import { useStateContext } from '@/contexts/ContextProvider';
 
 interface StackedChartProps {
-  width: string;
-  height: string;
+  data: Array<{
+    x: string;
+    y: number;
+    y1: number;
+    y2: number;
+  }>;
+  width?: string | number;
+  height?: string | number;
 }
 
-const StackedChart: React.FC<StackedChartProps> = ({ width, height }) => {
-  const { currentMode, themeColor } = useStateContext();
-  const [isClient, setIsClient] = useState(false);
+const StackedChart = ({ data, width = "100%", height = "100%" }: StackedChartProps) => {
+  const { currentMode } = useStateContext();
 
-  useEffect(() => {
-    setIsClient(true); // Set to true after the component is mounted on the client side
-  }, []);
-
-  if (!isClient) return null; // Prevent rendering during SSR
+  const colors = {
+    y: '#00bdae',
+    y1: '#404041',
+    y2: '#357cd2'
+  };
 
   return (
-    <ChartComponent
-      width={width}
-      height={height}
-      id="charts"
-      primaryXAxis={stackedPrimaryXAxis}
-      primaryYAxis={stackedPrimaryYAxis}
-      chartArea={{ border: { width: 0 } }}
-      tooltip={{ enable: true }}
-      legendSettings={{
-        textStyle: { color: currentMode === "dark" ? "#fff" : "black" },
-      }}
-    >
-      <Inject services={[Legend, Category, StackingColumnSeries, Tooltip]} />
-      <SeriesCollectionDirective>
-        {stackedCustomSeries.map((item, index) => (
-          <SeriesDirective
-            key={index}
-            {...item}
-            fill={
-              index === 0
-                ? themeColor
-                : currentMode === "dark"
-                ? "#9ca3af"
-                : "#404041"
-            }
-          />
-        ))}
-      </SeriesCollectionDirective>
-    </ChartComponent>
+    <ResponsiveContainer width={width} height={height}>
+      <BarChart
+        data={data}
+        margin={{
+          top: 20,
+          right: 30,
+          left: 20,
+          bottom: 5,
+        }}
+      >
+        <CartesianGrid
+          strokeDasharray="3 3"
+          className="dark:stroke-gray-600"
+        />
+        <XAxis
+          dataKey="x"
+          className="dark:text-gray-300"
+          tick={{ fontSize: 12 }}
+        />
+        <YAxis
+          className="dark:text-gray-300"
+          tick={{ fontSize: 12 }}
+        />
+        <Tooltip
+          contentStyle={{
+            backgroundColor: currentMode === 'Dark' ? '#333' : '#fff',
+            color: currentMode === 'Dark' ? '#fff' : '#000',
+            border: 'none',
+            borderRadius: '4px',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}
+        />
+        <Legend
+          wrapperStyle={{
+            color: currentMode === 'Dark' ? '#fff' : '#000',
+          }}
+        />
+        <Bar
+          dataKey="y"
+          stackId="a"
+          fill={colors.y}
+          name="Budget"
+          radius={[4, 4, 0, 0]}
+        />
+        <Bar
+          dataKey="y1"
+          stackId="a"
+          fill={colors.y1}
+          name="Expense"
+          radius={[4, 4, 0, 0]}
+        />
+        <Bar
+          dataKey="y2"
+          stackId="a"
+          fill={colors.y2}
+          name="Revenue"
+          radius={[4, 4, 0, 0]}
+        />
+      </BarChart>
+    </ResponsiveContainer>
   );
 };
 

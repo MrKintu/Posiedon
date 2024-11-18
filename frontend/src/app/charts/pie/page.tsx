@@ -10,17 +10,17 @@
 import { useStateContext } from "@/contexts/ContextProvider";
 import { Header } from "@/components";
 import { useState, useEffect } from "react";
-import {
-  AccumulationChartComponent,
-  AccumulationSeriesCollectionDirective,
-  AccumulationSeriesDirective,
-  AccumulationLegend,
-  PieSeries,
-  AccumulationDataLabel,
-  Inject,
-  AccumulationTooltip,
-} from "@syncfusion/ej2-react-charts";
-import { pieChartData } from "public/data/dummy";
+import PieChart from "@/components/Charts/PieChart";
+
+const sampleData = [
+  { name: 'Social Media', value: 400 },
+  { name: 'Email Marketing', value: 300 },
+  { name: 'Content Marketing', value: 300 },
+  { name: 'SEO', value: 200 },
+  { name: 'PPC', value: 150 },
+];
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
 const PieChartPage: React.FC = () => {
   const { activeMenu, currentMode } = useStateContext();
@@ -40,56 +40,17 @@ const PieChartPage: React.FC = () => {
       <div className="m-2 md:m-10 py-4 px-2 md:p-10 bg-white rounded-3xl dark:text-gray-200 dark:bg-secondary-dark-bg">
         <Header category={"Pie"} title={"Project Cost Breakdown"} />
         <div className="w-full">
-          <AccumulationChartComponent
-            id="Pie-chart"
-            height="full"
-            tooltip={{ enable: true }}
-            background={currentMode === "dark" ? "#33373e" : "#fff"}
-            legendSettings={{
-              textStyle: {
-                color: currentMode === "dark" ? "#fff" : "black",
-                size: "20px",
-              },
-              visible: true,
-              shapeWidth: 15,
-              shapeHeight: 15,
-            }}
-          >
-            <Inject
-              services={[
-                AccumulationLegend,
-                PieSeries,
-                AccumulationDataLabel,
-                AccumulationTooltip,
-              ]}
+          <div className="w-full h-[420px]">
+            <PieChart
+              data={sampleData}
+              dataKey="value"
+              nameKey="name"
+              colors={COLORS}
+              innerRadius={60}
+              outerRadius={140}
+              label
             />
-
-            <AccumulationSeriesCollectionDirective>
-              <AccumulationSeriesDirective
-                dataSource={pieChartData}
-                name="Sale"
-                xName="x"
-                yName="y"
-                innerRadius="40%"
-                startAngle={0}
-                endAngle={360}
-                radius="70%"
-                explode
-                explodeOffset="10%"
-                explodeIndex={2}
-                type="Pie"
-                dataLabel={{
-                  visible: true,
-                  name: "text",
-                  position: "Inside",
-                  font: {
-                    fontWeight: "600",
-                    color: "#fff",
-                  },
-                }}
-              />
-            </AccumulationSeriesCollectionDirective>
-          </AccumulationChartComponent>
+          </div>
         </div>
       </div>
     </div>

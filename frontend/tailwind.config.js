@@ -8,8 +8,8 @@ module.exports = {
     "./src/app/**/**/*.{js,ts,jsx,tsx,mdx}",
     "./public/data/*.{js,ts,jsx,tsx,mdx}",
   ],
-  mode: "jit", // Keep JIT mode if you prefer it
-  darkMode: "class", // Same in both files
+  mode: "jit",
+  darkMode: 'class',
   theme: {
     container: {
       center: true,
@@ -24,10 +24,7 @@ module.exports = {
       "2xl": "1400px",
     },
     extend: {
-      // Merge custom colors
       colors: {
-        exm: "#fff",
-        "theme-button": "#99abb4",
         current: "currentColor",
         transparent: "transparent",
         white: "#FFFFFF",
@@ -35,7 +32,6 @@ module.exports = {
         dark: "#1D2430",
         primary: "#4A6CF7",
         yellow: "#FBB040",
-        "bg-color-dark": "#171C28",
         "body-color": {
           DEFAULT: "#788293",
           dark: "#959CB1",
@@ -48,15 +44,18 @@ module.exports = {
           ...colors.gray,
           dark: "#1E232E",
           light: "#F0F2F9",
-        },
-        "main-bg": "#FAFBFB",
-        "main-dark-bg": "#20232A",
-        "secondary-dark-bg": "#33373E",
-        "light-gray": "#F7F7F7",
-        "half-transparent": "rgba(0, 0, 0, 0.5)",
-        "theme-bg": "#484B52",
+        }
       },
-      // Merge fontSize, fontFamily, etc.
+      backgroundColor: {
+        'main-bg': 'rgb(var(--color-bg))',
+        'sidebar': 'rgb(var(--color-sidebar))',
+        'secondary-dark-bg': '#33373E',
+        'light-gray': '#F7F7F7',
+        'half-transparent': 'rgba(0, 0, 0, 0.5)',
+      },
+      textColor: {
+        'main-text': 'rgb(var(--color-text))',
+      },
       fontSize: {
         14: "14px",
       },
@@ -87,7 +86,6 @@ module.exports = {
       backgroundImage: {
         "hero-pattern": "url('/data/welcome-bg.svg')",
       },
-      // Merge boxShadow and dropShadow from second file
       boxShadow: {
         signUp: "0px 5px 10px rgba(4, 10, 34, 0.2)",
         one: "0px 2px 3px rgba(7, 7, 77, 0.05)",

@@ -5,53 +5,73 @@
  * Copyright (c) 2024 Kintu Declan Trevor
  */
 
-"use client";
-
 import "./globals.css";
-import { Navbar, Sidebar, ThemeWindow } from "@/components";
-import Footer from "@/components/Footer";
-import { ContextProvider } from "@/contexts/ContextProvider";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { ReactNode, useState, useEffect } from "react";
+import { Open_Sans } from "next/font/google";
+import { Providers } from "@/contexts/Providers";
+import DashboardLayout from "@/components/Layouts/DashboardLayout";
 
-interface RootLayoutProps {
-  children: ReactNode;
-}
+const openSans = Open_Sans({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-open",
+});
 
-const LayoutContent = ({ children }: RootLayoutProps) => {
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  if (!isClient) return null; // Delay rendering until on the client
-
-  return (
-    <main className="flex flex-col min-h-screen dark:bg-main-dark-bg">
-      <Navbar />
-      <div className="flex flex-1 w-full relative dark:bg-main-dark-bg bg-main-bg">
-        <Sidebar />
-        <ThemeWindow />
-        <div className="w-full mt-[64px] flex-1 transition-all duration-300 ease-in-out p-4 md:p-8 lg:p-12">
-          {children}
-        </div>
-      </div>
-      <Footer />
-    </main>
-  );
+export const metadata = {
+  title: "Mazu Marketing",
+  description: "Modern Marketing Platform",
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/favicon-512x512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
 };
 
-export default function RootLayout({ children }: RootLayoutProps) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en" id="base-html">
+    <html 
+      id="base-html" 
+      lang="en" 
+      suppressHydrationWarning
+      className="transition-colors duration-200"
+    >
       <head />
-      <body>
-        <ContextProvider>
-          <AuthProvider>
-            <LayoutContent>{children}</LayoutContent>
-          </AuthProvider>
-        </ContextProvider>
+      <body 
+        className={`font-open antialiased bg-main-bg transition-colors duration-200 ${openSans.variable}`}
+      >
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                console.log('[Layout] Current theme class:', document.documentElement.className);
+                const observer = new MutationObserver((mutations) => {
+                  mutations.forEach((mutation) => {
+                    if (mutation.attributeName === 'class') {
+                      console.log('[Layout] Theme class changed:', document.documentElement.className);
+                    }
+                  });
+                });
+                observer.observe(document.documentElement, {
+                  attributes: true,
+                  attributeFilter: ['class']
+                });
+              })();
+            `
+          }}
+        />
+        <Providers>
+          <DashboardLayout>{children}</DashboardLayout>
+        </Providers>
       </body>
     </html>
   );

@@ -9,23 +9,35 @@
 
 import { useStateContext } from "@/contexts/ContextProvider";
 import { Header } from "@/components";
+import BarChart from "@/components/Charts/BarChart";
 import { useEffect, useState } from "react";
-import {
-  ChartComponent,
-  SeriesCollectionDirective,
-  SeriesDirective,
-  Inject,
-  Legend,
-  Category,
-  Tooltip,
-  ColumnSeries,
-  DataLabel,
-} from "@syncfusion/ej2-react-charts";
-import {
-  barPrimaryXAxis,
-  barPrimaryYAxis,
-  barCustomSeries,
-} from "public/data/dummy";
+
+const sampleData = [
+  {
+    name: 'Q1',
+    revenue: 4000,
+    expenses: 2400,
+    profit: 1600,
+  },
+  {
+    name: 'Q2',
+    revenue: 3000,
+    expenses: 1398,
+    profit: 1602,
+  },
+  {
+    name: 'Q3',
+    revenue: 2000,
+    expenses: 980,
+    profit: 1020,
+  },
+  {
+    name: 'Q4',
+    revenue: 2780,
+    expenses: 1908,
+    profit: 872,
+  },
+];
 
 const BarChartPage: React.FC = () => {
   const { activeMenu, currentMode } = useStateContext();
@@ -43,29 +55,21 @@ const BarChartPage: React.FC = () => {
   return (
     <div className={activeMenu ? "md:ml-72" : "w-full flex-2"}>
       <div className="m-2 md:m-10 py-4 px-2 md:p-10 bg-white rounded-3xl dark:text-gray-200 dark:bg-secondary-dark-bg">
-        <Header category={"Bar"} title={"Olympic Medal Counts - RIO"} />
+        <Header category={"Bar"} title={"Quarterly Performance"} />
         <div className="w-full">
-          <ChartComponent
-            id="bar-chart"
-            height="420px"
-            primaryXAxis={barPrimaryXAxis}
-            primaryYAxis={barPrimaryYAxis}
-            chartArea={{ border: { width: 0 } }}
-            tooltip={{ enable: true }}
-            background={currentMode === "dark" ? "#33373e" : "#fff"}
-            legendSettings={{
-              textStyle: { color: currentMode === "dark" ? "#fff" : "black" },
-            }}
-          >
-            <Inject
-              services={[Category, Legend, Tooltip, ColumnSeries, DataLabel]}
+          <div className="w-full h-[420px]">
+            <BarChart
+              data={sampleData}
+              bars={[
+                { dataKey: 'revenue', name: 'Revenue', color: '#8884d8' },
+                { dataKey: 'expenses', name: 'Expenses', color: '#82ca9d' },
+                { dataKey: 'profit', name: 'Profit', color: '#ffc658' },
+              ]}
+              xAxisDataKey="name"
+              grid
+              layout="vertical"
             />
-            <SeriesCollectionDirective>
-              {barCustomSeries.map((item, index) => (
-                <SeriesDirective key={index} {...item} />
-              ))}
-            </SeriesCollectionDirective>
-          </ChartComponent>
+          </div>
         </div>
       </div>
     </div>

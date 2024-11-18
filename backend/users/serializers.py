@@ -132,25 +132,29 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):
-        logger.info("Validating login credentials.")
+        logger.info("Validating login credentials for email: %s", data['email'])
         
         # Retrieve the user by email
         try:
             user = User.objects.get(email=data['email'])
+            logger.info("Found user with email: %s", data['email'])
         except User.DoesNotExist:
             logger.warning("Login attempt with non-existing email: %s", data['email'])
-            raise serializers.ValidationError("Invalid email or password")
+            raise serializers.ValidationError({"detail": "Invalid email or password"})
         
-        # Authenticate with the retrieved username and provided password
-        user = authenticate(username=user.username, password=data['password'])
+        # Authenticate with username and password
+        authenticated_user = authenticate(username=user.username, password=data['password'])
         
-        if user and user.is_active:
-            logger.info("User %s authenticated successfully.", user.username)
-            self.context['user'] = user  # Storing user in the context for token generation
-            return model_to_dict(user)
+        if authenticated_user and authenticated_user.is_active:
+            logger.info("User %s authenticated successfully", authenticated_user.username)
+            self.context['user'] = authenticated_user
+            return {
+                'user': authenticated_user,
+                'email': data['email']
+            }
         
-        logger.warning("Invalid login attempt with email: %s", data['email'])
-        raise serializers.ValidationError("Invalid email or password")
+        logger.warning("Invalid password for email: %s", data['email'])
+        raise serializers.ValidationError({"detail": "Invalid email or password"})
 
     def create(self, validated_data):
         logger.info("Creating JWT tokens for user.")
@@ -159,11 +163,13 @@ class LoginSerializer(serializers.Serializer):
         user = self.context['user']
         refresh = RefreshToken.for_user(user)
         
+        # Get user data using serializer
+        user_data = UserSerializer(user).data
+        
         logger.info("Tokens generated for user: %s", user.username)
         
         return {
             'refresh': str(refresh),
             'access': str(refresh.access_token), # type: ignore
-            'user': UserSerializer(user).data,
+            'user': user_data
         }
-    

@@ -12,6 +12,7 @@ from rest_framework import status, generics
 from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Customer, Staff
 from .serializers import (UserSerializer, LoginSerializer, CustomerDetailSerializer, CustomerSerializer,
                           StaffSerializer, StaffDetailSerializer)
@@ -31,18 +32,43 @@ class RegisterView(generics.CreateAPIView):
 
 
 # Login User
-class LoginView(TokenObtainPairView):
+class LoginView(APIView):
+    permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
+
+    def post(self, request):
+        try:
+            serializer = self.serializer_class(data=request.data, context={'request': request})
+            serializer.is_valid(raise_exception=True)
+            response_data = serializer.create(serializer.validated_data)
+            return Response(response_data, status=status.HTTP_200_OK)
+        except serializers.ValidationError as e:
+            return Response(
+                {"detail": str(e.detail[0]) if isinstance(e.detail, list) else str(e.detail)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            return Response(
+                {"detail": "An error occurred during login."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 # Logout User
 class LogoutView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         try:
-            request.user.auth_token.delete()
-        except (AttributeError, Token.DoesNotExist):
-            pass
-        return Response(status=status.HTTP_204_NO_CONTENT)
+            # Blacklist the refresh token
+            refresh_token = request.data.get('refresh_token')
+            if refresh_token:
+                token = RefreshToken(refresh_token)
+                token.blacklist()
+            return Response({"message": "Successfully logged out."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Fetch all Customers

@@ -10,9 +10,10 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useTheme } from 'next-themes';
 
 // Reusable SocialIcon component
-const SocialIcon = ({ href, label, children }) => (
+const SocialIcon: React.FC<{ href: string; label: string; children: React.ReactNode }> = ({ href, label, children }) => (
   <a
     href={href}
     aria-label={label}
@@ -25,11 +26,11 @@ const SocialIcon = ({ href, label, children }) => (
 );
 
 // Reusable LinkItem component
-const LinkItem = ({ href, children }) => (
+const LinkItem: React.FC<{ href: string; children: React.ReactNode }> = ({ href, children }) => (
   <li>
     <Link
       href={href}
-      className="mb-4 inline-block text-base text-body-color duration-300 hover:text-primary dark:text-body-color-dark dark:hover:text-primary"
+      className="inline-block text-base leading-loose text-body-color hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors duration-200"
     >
       {children}
     </Link>
@@ -38,105 +39,93 @@ const LinkItem = ({ href, children }) => (
 
 const Footer = () => {
   const [isClient, setIsClient] = useState(false);
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
-    // Set state to true when client-side rendering
     setIsClient(true);
   }, []);
 
-  // Return a loading state or null during SSR to avoid hydration mismatch
-  if (!isClient) {
-    return null;
-  }
+  if (!isClient) return null;
 
   return (
-    <footer className="bg-main-bg dark:bg-main-dark-bg pt-16 md:pt-20 lg:pt-24">
-      <div className="container mx-auto"> {/* Added mx-auto for centering */}
-        <div className="-mx-4 flex flex-wrap">
-          {/* Logo and Description */}
-          <div className="w-full px-4 md:w-1/2 lg:w-4/12 xl:w-5/12 mb-12 lg:mb-16">
-            <Link href="/" className="mb-8 inline-block">
-              <Image
-                src="/images/logo/logo-2.svg"
-                alt="logo"
-                className="w-full dark:hidden"
-                width={140}
-                height={30}
-              />
-              <Image
-                src="/images/logo/logo.svg"
-                alt="logo"
-                className="hidden w-full dark:block"
-                width={140}
-                height={30}
-              />
-            </Link>
-            <p className="mb-9 text-base leading-relaxed text-body-color dark:text-body-color-dark">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer lobortis.
-            </p>
-            <div className="flex items-center">
-              <SocialIcon href="/" label="facebook">
-                {/* Facebook Icon */}
-                <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
-                  <path d="M12.1 10.4939V7.42705C12.1 6.23984..." fill="currentColor" />
-                </svg>
-              </SocialIcon>
-              <SocialIcon href="/" label="twitter">
-                {/* Twitter Icon */}
-                <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
-                  <path d="M13.9831 19.25L9.82094 13.3176..." fill="currentColor" />
-                </svg>
-              </SocialIcon>
-              <SocialIcon href="/" label="youtube">
-                {/* YouTube Icon */}
-                <svg width="18" height="14" viewBox="0 0 18 14" className="fill-current">
-                  <path d="M17.5058 2.07119C17.3068 1.2488..." />
-                </svg>
-              </SocialIcon>
-              <SocialIcon href="/" label="linkedin">
-                {/* LinkedIn Icon */}
-                <svg width="17" height="16" viewBox="0 0 17 16" className="fill-current">
-                  <path d="M15.2196 0H1.99991C1.37516 0..." />
-                </svg>
-              </SocialIcon>
+    <footer className="relative z-10 bg-white dark:bg-secondary-dark-bg pt-16 md:pt-20 lg:pt-24 border-t border-gray-200 dark:border-gray-700">
+      <div className="container px-4">
+        <div className="flex flex-wrap -mx-4">
+          <div className="w-full px-4 md:w-1/2 lg:w-4/12 xl:w-5/12">
+            <div className="mb-12 max-w-[360px] lg:mb-16">
+              <Link href="/" className="mb-8 inline-block">
+                <Image
+                  src={resolvedTheme === 'dark' ? '/images/dark.png' : '/images/white.png'}
+                  alt="logo"
+                  className="w-full"
+                  width={140}
+                  height={30}
+                />
+              </Link>
+              <p className="mb-9 text-base leading-relaxed text-body-color dark:text-gray-300">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer
+                lobortis.
+              </p>
+              <div className="flex items-center">
+                <SocialIcon href="#" label="Facebook" children={undefined}>
+                  {/* Social icons */}
+                </SocialIcon>
+              </div>
             </div>
           </div>
 
-          {/* Links Section */}
-          <div className="w-full px-4 sm:w-1/2 md:w-1/2 lg:w-2/12 xl:w-2/12 mb-12 lg:mb-16">
-            <h2 className="mb-10 text-xl font-bold text-black dark:text-white">Useful Links</h2>
-            <ul>
-              <LinkItem href="/blog">Blog</LinkItem>
-              <LinkItem href="/">Pricing</LinkItem>
-              <LinkItem href="/about">About</LinkItem>
-            </ul>
+          <div className="w-full px-4 sm:w-1/2 md:w-1/2 lg:w-2/12 xl:w-2/12">
+            <div className="mb-12 lg:mb-16">
+              <h2 className="mb-10 text-xl font-bold text-black dark:text-white">
+                Useful Links
+              </h2>
+              <ul>
+                <LinkItem href="/blog">Blog</LinkItem>
+                <LinkItem href="/pricing">Pricing</LinkItem>
+                <LinkItem href="/about">About</LinkItem>
+              </ul>
+            </div>
           </div>
 
-          {/* Terms Section */}
-          <div className="w-full px-4 sm:w-1/2 md:w-1/2 lg:w-2/12 xl:w-2/12 mb-12 lg:mb-16">
-            <h2 className="mb-10 text-xl font-bold text-black dark:text-white">Terms</h2>
-            <ul>
-              <LinkItem href="/">TOS</LinkItem>
-              <LinkItem href="/">Privacy Policy</LinkItem>
-              <LinkItem href="/">Refund Policy</LinkItem>
-            </ul>
+          <div className="w-full px-4 sm:w-1/2 md:w-1/2 lg:w-2/12 xl:w-2/12">
+            <div className="mb-12 lg:mb-16">
+              <h2 className="mb-10 text-xl font-bold text-black dark:text-white">
+                Terms
+              </h2>
+              <ul>
+                <LinkItem href="/tos">TOS</LinkItem>
+                <LinkItem href="/privacy">Privacy Policy</LinkItem>
+                <LinkItem href="/refund">Refund Policy</LinkItem>
+              </ul>
+            </div>
           </div>
 
-          {/* Support Section */}
-          <div className="w-full px-4 md:w-1/2 lg:w-4/12 xl:w-3/12 mb-12 lg:mb-16">
-            <h2 className="mb-10 text-xl font-bold text-black dark:text-white">Support & Help</h2>
-            <ul>
-              <LinkItem href="/contact">Open Support Ticket</LinkItem>
-              <LinkItem href="/">Terms of Use</LinkItem>
-              <LinkItem href="/about">About</LinkItem>
-            </ul>
+          <div className="w-full px-4 md:w-1/2 lg:w-4/12 xl:w-3/12">
+            <div className="mb-12 lg:mb-16">
+              <h2 className="mb-10 text-xl font-bold text-black dark:text-white">
+                Support & Help
+              </h2>
+              <ul>
+                <LinkItem href="/contact">Contact Us</LinkItem>
+                <LinkItem href="/support">Support</LinkItem>
+                <LinkItem href="/faq">FAQ</LinkItem>
+              </ul>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Divider and Footer Note */}
-        <div className="h-px w-full bg-gradient-to-r from-transparent via-[#D2D8E183] to-transparent dark:via-[#959CB183]" />
-        <div className="py-8 text-center text-base text-body-color dark:text-white">
-          Created by Angaza Technologies.
+      <div className="mt-12 border-t border-gray-200 dark:border-gray-700 py-8 lg:mt-16">
+        <div className="container px-4">
+          <div className="flex flex-wrap items-center justify-center">
+            <div className="w-full md:w-2/3 lg:w-1/2">
+              <div className="text-center lg:text-left">
+                <p className="text-base text-body-color dark:text-gray-300">
+                  &copy; {new Date().getFullYear()} Mazu Marketing. All rights reserved.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

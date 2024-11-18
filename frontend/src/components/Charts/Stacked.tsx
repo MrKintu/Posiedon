@@ -5,57 +5,86 @@
  * Copyright (c) 2024 Kintu Declan Trevor
  */
 
-"use client";
-
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
-  ChartComponent,
-  SeriesCollectionDirective,
-  SeriesDirective,
-  Inject,
-  Legend,
-  Category,
-  StackingColumnSeries,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
   Tooltip,
-} from "@syncfusion/ej2-react-charts";
-import {
-  stackedCustomSeries,
-  stackedPrimaryXAxis,
-  stackedPrimaryYAxis,
-} from "public/data/dummy";
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
+import { useStateContext } from '@/contexts/ContextProvider';
 
 interface StackedProps {
-  width: string;
-  height: string;
+  width?: string;
+  height?: string;
 }
 
-const Stacked: React.FC<StackedProps> = ({ width, height }) => {
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true); // Only set to true on the client side
-  }, []);
-
-  if (!isClient) return null; // Prevent rendering on the server side
+const Stacked: React.FC<StackedProps> = ({ width = '100%', height = '420px' }) => {
+  const { currentMode } = useStateContext();
+  
+  // Sample data - replace with your actual data
+  const data = [
+    { month: 'Jan', Budget: 2400, Expense: 1398 },
+    { month: 'Feb', Budget: 1398, Expense: 2800 },
+    { month: 'Mar', Budget: 9800, Expense: 2800 },
+    { month: 'Apr', Budget: 3908, Expense: 2800 },
+    { month: 'May', Budget: 4800, Expense: 2800 },
+    { month: 'Jun', Budget: 3800, Expense: 2800 },
+    { month: 'Jul', Budget: 4300, Expense: 2800 },
+  ];
 
   return (
-    <ChartComponent
-      width={width}
-      height={height}
-      id="charts"
-      primaryXAxis={stackedPrimaryXAxis}
-      primaryYAxis={stackedPrimaryYAxis}
-      chartArea={{ border: { width: 0 } }}
-      tooltip={{ enable: true }}
-      legendSettings={{ background: "white" }}
-    >
-      <Inject services={[Legend, Category, StackingColumnSeries, Tooltip]} />
-      <SeriesCollectionDirective>
-        {stackedCustomSeries.map((item, index) => (
-          <SeriesDirective key={index} {...item} />
-        ))}
-      </SeriesCollectionDirective>
-    </ChartComponent>
+    <div style={{ width, height }} className="rounded-lg bg-white dark:bg-secondary-dark-bg p-4">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={data}
+          margin={{
+            top: 20,
+            right: 30,
+            left: 20,
+            bottom: 5,
+          }}
+        >
+          <CartesianGrid
+            strokeDasharray="3 3"
+            className="stroke-gray-200 dark:stroke-gray-600"
+          />
+          <XAxis
+            dataKey="month"
+            className="text-gray-600 dark:text-gray-400"
+          />
+          <YAxis
+            className="text-gray-600 dark:text-gray-400"
+          />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: currentMode === 'Dark' ? '#33373E' : '#fff',
+              border: 'none',
+              borderRadius: '8px',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+              color: currentMode === 'Dark' ? '#fff' : '#333',
+            }}
+          />
+          <Legend />
+          <Bar
+            dataKey="Budget"
+            stackId="a"
+            fill="#00bdae"
+            radius={[4, 4, 0, 0]}
+          />
+          <Bar
+            dataKey="Expense"
+            stackId="a"
+            fill="#404041"
+            radius={[4, 4, 0, 0]}
+          />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
   );
 };
 

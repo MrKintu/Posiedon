@@ -7,62 +7,69 @@
 
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
-  SparklineComponent,
-  Inject,
-  SparklineTooltip,
-} from "@syncfusion/ej2-react-charts";
+  LineChart,
+  Line,
+  ResponsiveContainer,
+  Tooltip
+} from "recharts";
+import { useStateContext } from "@/contexts/ContextProvider";
 
 interface SparkLineProps {
-  currentColor: string;
-  id: string;
-  type: "Line" | "Area" | "Column" | "WinLoss"; // Specify types based on your usage
-  height: string;
-  width: string;
-  data: Array<{ x: number | string; yval: number }>; // Adjust based on your data structure
-  color: string;
+  id?: string;
+  height?: string;
+  width?: string;
+  color?: string;
+  data: Array<{
+    x: number;
+    yval: number;
+  }>;
+  type?: string;
+  currentColor?: string;
 }
 
 const SparkLine: React.FC<SparkLineProps> = ({
-  currentColor,
   id,
-  type,
-  height,
-  width,
+  height = "80px",
+  width = "250px",
+  color = "#fff",
   data,
-  color,
+  type,
+  currentColor,
 }) => {
-  const [isClient, setIsClient] = useState(false);
+  const { currentMode } = useStateContext();
 
-  useEffect(() => {
-    setIsClient(true); // Only set to true on the client side
-  }, []);
-
-  if (!isClient) return null; // Prevent rendering on the server side
+  // Transform data for Recharts format
+  const chartData = data.map(item => ({
+    x: item.x,
+    value: item.yval,
+  }));
 
   return (
-    <SparklineComponent
-      id={id}
-      height={height}
-      width={width}
-      lineWidth={1}
-      valueType="Numeric"
-      fill={color}
-      border={{ color: currentColor, width: 2 }}
-      dataSource={data}
-      xName="x"
-      yName="yval"
-      type={type}
-      tooltipSettings={{
-        visible: true,
-        format: "${yval}",
-        trackLineSettings: { visible: true },
-      }}
-      markerSettings={{ visible: ["All"], fill: `${color}` }}
-    >
-      <Inject services={[SparklineTooltip]} />
-    </SparklineComponent>
+    <div style={{ width, height }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={chartData}>
+          <Line
+            type="monotone"
+            dataKey="value"
+            stroke={currentColor || color}
+            strokeWidth={2}
+            dot={false}
+          />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: currentMode === "Dark" ? "#333" : "#fff",
+              color: currentMode === "Dark" ? "#fff" : "#000",
+              border: "none",
+              borderRadius: "4px",
+            }}
+            formatter={(value: number) => [value, ""]}
+            labelFormatter={() => ""}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   );
 };
 

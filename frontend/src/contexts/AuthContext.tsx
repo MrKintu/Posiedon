@@ -5,24 +5,111 @@
  * Copyright (c) 2024 Kintu Declan Trevor
  */
 
-import React, { createContext, useState, useContext, ReactNode } from "react";
+import React, { createContext, useState, useContext, ReactNode, useEffect } from "react";
+import ApiClient from '@/utilities/api_client';
+import { secureStorage, isTokenExpired } from '@/utils/auth';
 
-interface AuthContextType {
+interface UserData {
+  id?: number;
+  username?: string;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  is_staff?: boolean;
+  is_active?: boolean;
+  customer?: {
+    business?: string;
+  };
+}
+
+interface AuthState {
   isLoggedIn: boolean;
   username?: string;
-  setAuthContext: React.Dispatch<React.SetStateAction<{ isLoggedIn: boolean; username?: string }>>;
+  userData?: UserData;
+}
+
+interface AuthContextType extends AuthState {
+  setAuthContext: React.Dispatch<React.SetStateAction<AuthState>>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [authState, setAuthState] = useState<{ isLoggedIn: boolean; username?: string }>({
-    isLoggedIn: false,
+  const [authState, setAuthState] = useState<AuthState>(() => {
+    // Initialize state from secure storage if available
+    if (typeof window !== 'undefined') {
+      const token = secureStorage.getItem('access_token');
+      const userData = secureStorage.getItem('user_data');
+      
+      if (token && userData) {
+        try {
+          // Validate token before restoring session
+          if (isTokenExpired(token)) {
+            secureStorage.clear(); // Clear invalid session
+            return { isLoggedIn: false };
+          }
+          
+          return {
+            isLoggedIn: true,
+            userData: typeof userData === 'string' ? JSON.parse(userData) : userData,
+            username: typeof userData === 'string' ? JSON.parse(userData).username : userData.username
+          };
+        } catch (e) {
+          console.error('Error parsing stored user data:', e);
+          secureStorage.clear(); // Clear corrupted data
+        }
+      }
+    }
+    return { isLoggedIn: false };
   });
 
-  // Expose both the authState and setAuthState (for updating the context) to the app
+  const logout = async () => {
+    try {
+      const refreshToken = secureStorage.getItem('refresh_token');
+      if (refreshToken) {
+        // Call the backend logout endpoint
+        await ApiClient.post('users/sign-out/', { refresh_token: refreshToken });
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      // Clear secure storage
+      secureStorage.clear();
+      
+      // Reset auth state
+      setAuthState({ isLoggedIn: false, userData: undefined, username: undefined });
+
+      // Force reload to home page
+      window.location.replace('/');
+    }
+  };
+
+  // Store user data in secure storage when it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined' && authState.userData) {
+      secureStorage.setItem('user_data', authState.userData);
+    }
+  }, [authState.userData]);
+
+  // Check token expiration periodically
+  useEffect(() => {
+    if (typeof window !== 'undefined' && authState.isLoggedIn) {
+      const checkToken = () => {
+        const token = secureStorage.getItem('access_token');
+        if (!token || isTokenExpired(token)) {
+          logout();
+        }
+      };
+
+      // Check every minute
+      const interval = setInterval(checkToken, 60000);
+      return () => clearInterval(interval);
+    }
+  }, [authState.isLoggedIn]);
+
   return (
-    <AuthContext.Provider value={{ ...authState, setAuthContext: setAuthState }}>
+    <AuthContext.Provider value={{ ...authState, setAuthContext: setAuthState, logout }}>
       {children}
     </AuthContext.Provider>
   );

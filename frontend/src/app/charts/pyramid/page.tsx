@@ -5,96 +5,112 @@
  * Copyright (c) 2024 Kintu Declan Trevor
  */
 
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useStateContext } from "@/contexts/ContextProvider";
-import { Header } from "@/components";
-
+import { useState, useEffect } from 'react';
+import { useStateContext } from '@/contexts/ContextProvider';
+import { Header } from '@/components';
 import {
-	AccumulationChartComponent,
-	AccumulationSeriesCollectionDirective,
-	AccumulationSeriesDirective,
-	AccumulationLegend,
-	Inject,
-	AccumulationDataLabel,
-	AccumulationTooltip,
-	PyramidSeries,
-	AccumulationSelection,
-} from "@syncfusion/ej2-react-charts";
-
-import { PyramidData } from "public/data/dummy";
+  ResponsiveContainer,
+  FunnelChart,
+  Funnel,
+  LabelList,
+  Tooltip,
+  Cell
+} from 'recharts';
+import { PyramidData } from 'public/data/chartData';
 
 const PyramidChartPage: React.FC = () => {
-	const { activeMenu, currentMode } = useStateContext();
-	const [isClient, setIsClient] = useState(false);
+  const { activeMenu, currentMode } = useStateContext();
+  const [isClient, setIsClient] = useState(false);
 
-	// Hydration: Set isClient to true after the component is mounted on the client
-	useEffect(() => {
-		setIsClient(true);
-	}, []);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
-	// Don't render chart content until after hydration
-	if (!isClient) {
-		return null; // Or you can return a loading spinner, if preferred
-	}
+  if (!isClient) return null;
 
-	return (
-		<div className={activeMenu ? "md:ml-72" : "w-full flex-2"}>
-			<div className="m-2 md:m-10 py-4 px-2 md:p-10 bg-white rounded-3xl dark:text-gray-200 dark:bg-secondary-dark-bg">
-				<Header category={"Pyramid"} title={"Food Comparison Chart"} />
-				<div className="w-full">
-					<AccumulationChartComponent
-						id="Pyramid-chart"
-						height="full"
-						tooltip={{ enable: true }}
-						background={currentMode === "dark" ? "#33373e" : "#fff"}
-						legendSettings={{
-							textStyle: {
-								color: currentMode === "dark" ? "#fff" : "black",
-							},
-							visible: true,
-						}}
-					>
-						<Inject
-							services={[
-								AccumulationDataLabel,
-								AccumulationTooltip,
-								PyramidSeries,
-								AccumulationLegend,
-								AccumulationSelection,
-							]}
-						/>
+  // Transform data for Recharts format and sort by value
+  const chartData = [...PyramidData]
+    .sort((a, b) => b.value - a.value)
+    .map(item => ({
+      name: item.x,
+      value: item.y,
+      color: item.color,
+    }));
 
-						<AccumulationSeriesCollectionDirective>
-							<AccumulationSeriesDirective
-								dataSource={PyramidData}
-								name="Food"
-								xName="x"
-								yName="y"
-								width="45%"
-								height="80%"
-								explode
-								type="Pyramid"
-								neckWidth="15%"
-								gapRatio={0.03}
-								emptyPointSetting={{ mode: "Drop", fill: "red" }}
-								dataLabel={{
-									visible: true,
-									position: "Inside",
-									name: "text",
-									font: {
-										fontWeight: "600",
-										color: currentMode === "dark" ? "#fff" : "black",
-									},
-								}}
-							/>
-						</AccumulationSeriesCollectionDirective>
-					</AccumulationChartComponent>
-				</div>
-			</div>
-		</div>
-	);
+  const colors = [
+    '#00C49F',
+    '#00A7B3',
+    '#0088B3',
+    '#0069B3',
+    '#004AB3',
+    '#002CB3',
+  ];
+
+  return (
+    <div className={activeMenu ? "md:ml-72" : "w-full flex-2"}>
+      <div className="m-2 md:m-10 py-4 px-2 md:p-10 bg-white dark:bg-secondary-dark-bg rounded-3xl">
+        <Header category="Chart" title="Food Comparison Chart" />
+        <div className="w-full h-[600px] mt-8">
+          <ResponsiveContainer width="100%" height="100%">
+            <FunnelChart>
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: currentMode === 'Dark' ? '#333' : '#fff',
+                  color: currentMode === 'Dark' ? '#fff' : '#000',
+                  border: 'none',
+                  borderRadius: '4px',
+                }}
+                formatter={(value: number) => [`${value}%`, 'Percentage']}
+              />
+              <Funnel
+                data={chartData}
+                dataKey="value"
+                nameKey="name"
+                labelLine={false}
+              >
+                <LabelList
+                  position="right"
+                  fill={currentMode === 'Dark' ? '#fff' : '#000'}
+                  stroke="none"
+                  dataKey="name"
+                  fontSize={12}
+                />
+                <LabelList
+                  position="center"
+                  fill="#fff"
+                  stroke="none"
+                  dataKey="value"
+                  formatter={(value: number) => `${value}%`}
+                  fontSize={12}
+                />
+                {chartData.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={entry.color || colors[index % colors.length]}
+                  />
+                ))}
+              </Funnel>
+            </FunnelChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="mt-8 flex justify-center gap-6 flex-wrap">
+          {chartData.map((item, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <div
+                className="w-4 h-4"
+                style={{ backgroundColor: item.color || colors[index % colors.length] }}
+              ></div>
+              <span className={currentMode === 'Dark' ? 'text-white' : 'text-black'}>
+                {item.name}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default PyramidChartPage;

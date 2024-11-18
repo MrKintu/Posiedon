@@ -5,64 +5,89 @@
  * Copyright (c) 2024 Kintu Declan Trevor
  */
 
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { useStateContext } from "@/contexts/ContextProvider";
-import {
-  GridComponent,
-  ColumnsDirective,
-  ColumnDirective,
-  Page,
-  Inject,
-  Toolbar,
-  Sort,
-  Edit,
-} from "@syncfusion/ej2-react-grids";
-import { Header } from "@/components";
-import { customersData, customersGrid } from "public/data/dummy";
+import React, { useState, useEffect } from 'react';
+import { useStateContext } from '@/contexts/ContextProvider';
+import { Header } from '@/components';
+import { DataTable } from '@/components/DataTable';
+import { ordersData } from 'public/data/dummy';
+import { createColumnHelper } from '@tanstack/react-table';
 
-const CustomersPage: React.FC = () => {
-  const { activeMenu } = useStateContext();
+// Define the Order type based on your data structure
+type Order = {
+  OrderID: number;
+  CustomerName: string;
+  TotalAmount: number;
+  OrderItems: string;
+  Location: string;
+  Status: string;
+  StatusBg: string;
+  ProductImage: string;
+};
 
-  // Hydration handling state
+const OrdersPage = () => {
+  const { currentMode } = useStateContext();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true); // Set to true once the component mounts on the client
+    setIsClient(true);
   }, []);
 
-  // If the component hasn't hydrated yet, return null to prevent rendering issues
   if (!isClient) return null;
 
+  const columnHelper = createColumnHelper<Order>();
+
+  const columns = [
+    columnHelper.accessor('OrderID', {
+      header: 'Order ID',
+      cell: info => info.getValue(),
+    }),
+    columnHelper.accessor('CustomerName', {
+      header: 'Customer Name',
+      cell: info => info.getValue(),
+    }),
+    columnHelper.accessor('TotalAmount', {
+      header: 'Total Amount',
+      cell: info => `$${info.getValue()}`,
+    }),
+    columnHelper.accessor('OrderItems', {
+      header: 'Order Items',
+      cell: info => info.getValue(),
+    }),
+    columnHelper.accessor('Location', {
+      header: 'Location',
+      cell: info => info.getValue(),
+    }),
+    columnHelper.accessor('Status', {
+      header: 'Status',
+      cell: info => (
+        <div className="flex items-center">
+          <div
+            className="w-2.5 h-2.5 rounded-full mr-2"
+            style={{ backgroundColor: info.row.original.StatusBg }}
+          />
+          {info.getValue()}
+        </div>
+      ),
+    }),
+  ];
+
   return (
-    <div className={activeMenu ? "md:ml-72" : "w-full flex-2"}>
-      <div className="m-2 md:m-10 py-4 px-2 md:p-10 bg-white rounded-3xl dark:text-gray-200 dark:bg-secondary-dark-bg">
-        <Header title={"Customers"} category={"Page"} />
-        <GridComponent
-          dataSource={customersData}
-          allowPaging
-          allowSorting
-          toolbar={["Add", "Edit", "Delete", "Update", "Cancel"]}
-          width={"auto"}
-          selectionSettings={{ type: "Multiple", mode: "Row" }}
-          editSettings={{
-            allowEditing: true,
-            allowAdding: true,
-            allowDeleting: true,
-            mode: "Dialog",
-          }}
-        >
-          <ColumnsDirective>
-            {customersGrid.map((item, index) => (
-              <ColumnDirective key={index} {...item} />
-            ))}
-          </ColumnsDirective>
-          <Inject services={[Page, Toolbar, Sort, Edit]} />
-        </GridComponent>
+    <div className="m-2 md:m-10 p-2 md:p-10 bg-white dark:bg-secondary-dark-bg rounded-3xl">
+      <Header category="Page" title="Orders" />
+      <div className="w-full">
+        <DataTable
+          data={ordersData}
+          columns={columns}
+          enableSorting={true}
+          enablePagination={true}
+          showSearch={true}
+          darkMode={currentMode === 'Dark'}
+        />
       </div>
     </div>
   );
 };
 
-export default CustomersPage;
+export default OrdersPage;

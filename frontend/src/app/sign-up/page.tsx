@@ -31,7 +31,7 @@ interface UserDetails {
 
 const Signup = () => {
   const router = useRouter();
-  const { setAuthContext } = useAuthContext();  // Destructure setAuthContext from context
+  const { setAuthContext } = useAuthContext();
   const [userDetails, setUserDetails] = useState<UserDetails>({
     first_name: "",
     last_name: "",
@@ -49,9 +49,8 @@ const Signup = () => {
   });
   const [errors, setErrors] = useState<string[]>([]);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);  // State to handle hydration issue
+  const [isClient, setIsClient] = useState(false);
 
-  // Use useEffect to handle hydration issue
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -105,15 +104,46 @@ const Signup = () => {
     };
 
     try {
-      const response = await ApiClient.post("users/sign-up/", payload);
+      // Sign up the user
+      const signUpResponse = await ApiClient.post("users/sign-up/", payload);
+      if (signUpResponse.error) throw new Error(signUpResponse.error);
 
-      if (response.error) throw new Error(response.error);
+      // Sign in the user to get tokens
+      const signInResponse = await ApiClient.post("users/sign-in/", {
+        email: userDetails.email,
+        password: userDetails.password
+      });
+      if (signInResponse.error) throw new Error(signInResponse.error);
 
-      setAuthContext({ isLoggedIn: true, username: userDetails.first_name });  // Update AuthContext on successful sign-up
+      const { access, refresh, username } = signInResponse;
+
+      // Store tokens
+      localStorage.setItem("access_token", access);
+      localStorage.setItem("refresh_token", refresh);
+
+      // Fetch user profile data
+      const userProfileResponse = await ApiClient.get("users/profile/");
+
+      if (!userProfileResponse.error) {
+        // Update auth context with both authentication and user data
+        setAuthContext({
+          isLoggedIn: true,
+          username,
+          userData: userProfileResponse
+        });
+      } else {
+        // If profile fetch fails, still login but without profile data
+        setAuthContext({
+          isLoggedIn: true,
+          username
+        });
+      }
+
       setSuccessMessage("Sign-up successful! Redirecting to your account...");
-      setTimeout(() => router.push("/customers"), 2000);
+      setTimeout(() => router.push('/customers'), 2000);
     } catch (error) {
       setErrors(["An error occurred. Please try again later."]);
+      console.error(error);
     }
   };
 
@@ -132,7 +162,7 @@ const Signup = () => {
     "Health Care"
   ];
 
-  if (!isClient) return null;  // Ensure that rendering happens only on the client side
+  if (!isClient) return null;
 
   return (
     <section className="relative z-10 overflow-hidden pb-16 pt-36 md:pb-20 lg:pb-28 lg:pt-[180px]">
@@ -202,23 +232,27 @@ const Signup = () => {
                     name="description"
                     id="description"
                     required
-                    placeholder="Enter your company description"
+                    placeholder="Tell us about your business"
                     value={userDetails.description}
                     onChange={handleChange}
-                    spellCheck="true"
                     className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-sm border bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
                   />
                 </div>
-                <button
-                  type="submit"
-                  className="w-full rounded bg-primary py-3 text-base font-semibold text-white transition-all duration-300 hover:bg-opacity-90"
-                >
-                  Sign Up
-                </button>
+                <div className="mb-6">
+                  <button
+                    type="submit"
+                    className="shadow-submit dark:shadow-submit-dark flex w-full items-center justify-center rounded-sm bg-primary px-9 py-4 text-base font-medium text-white duration-300 hover:bg-primary/90"
+                  >
+                    Sign up
+                  </button>
+                </div>
+                <p className="text-center text-base font-medium text-body-color">
+                  Already have an account?{" "}
+                  <Link href="/sign-in" className="text-primary hover:underline">
+                    Sign in
+                  </Link>
+                </p>
               </form>
-              <div className="mt-6 text-center text-base font-medium text-body-color">
-                Already have an account? <Link href="/sign-in" className="text-primary">Sign In</Link>
-              </div>
             </div>
           </div>
         </div>

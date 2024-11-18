@@ -54,7 +54,7 @@ const Testimonials = () => {
   if (!mounted) return null;
 
   return (
-    <section className="dark:bg-bg-color-dark bg-gray-light relative z-10 py-16 md:py-20 lg:py-28">
+    <section className="bg-gray-light dark:bg-dark relative z-10 py-16 md:py-20 lg:py-28 transition-colors duration-200">
       <div className="container">
         <SectionTitle
           title="What Our Users Say"
@@ -69,7 +69,6 @@ const Testimonials = () => {
         </div>
       </div>
 
-      {/* Decorative SVGs */}
       <div className="absolute right-0 top-5 z-[-1]">
         <svg
           width="238"
@@ -77,6 +76,7 @@ const Testimonials = () => {
           viewBox="0 0 238 531"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
+          className="opacity-30 dark:opacity-20 transition-opacity duration-200"
         >
           <rect
             opacity="0.3"

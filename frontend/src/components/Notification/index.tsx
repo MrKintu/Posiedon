@@ -10,60 +10,67 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useStateContext } from "@/contexts/ContextProvider";
-import { chatData } from "public/data/dummy";
+import { notificationData } from "public/data/uiData";
 import { SubHeading, Button } from "@/components";
+import { CgProfile } from "react-icons/cg";
 
 const Notification: React.FC = () => {
   const { handleClosingClick } = useStateContext();
-  const [isClient, setIsClient] = useState(false);  // Manage client-side state
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);  // Set client-side state to true once mounted
+    setIsClient(true);
   }, []);
 
-  // Skip rendering during hydration issues
   if (!isClient) return null;
 
   return (
-    <div className="nav-item bg-white dark:bg-secondary-dark-bg absolute top-16 right-0 md:right-40 w-full md:w-96 rounded-lg p-8">
+    <div className="nav-item absolute top-16 right-5 md:right-40 bg-white dark:bg-secondary-dark-bg p-8 rounded-lg w-96">
       <SubHeading
-        text={"Notification"}
-        secText={"3 New"}
+        text="Notifications"
+        secText="3 New"
         func={() => handleClosingClick("notification")}
       />
-      <div>
-        {chatData.map((item, index) => (
+
+      <div className="mt-5">
+        {notificationData.map((item, index) => (
           <div
             key={index}
-            className="flex gap-5 items-center p-3 border-b-1 border-color dark:border-gray-600 cursor-pointer"
+            className="flex items-center gap-4 border-b border-gray-200 dark:border-gray-600 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
           >
-            <Image
-              src={item.image}
-              alt={item.message}
-              className="rounded-full w-10 h-10"
-            />
-            <div className="flex-1">
-              <h3 className="font-semibold dark:text-gray-200">
+            {item.image ? (
+              <div className="relative w-10 h-10">
+                <Image
+                  src={item.image}
+                  alt={item.message}
+                  fill
+                  className="rounded-full object-cover"
+                />
+              </div>
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                <CgProfile className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+              </div>
+            )}
+            <div>
+              <p className="font-semibold dark:text-gray-200">
                 {item.message}
-              </h3>
+              </p>
               <p className="text-gray-500 dark:text-gray-400 text-sm">
                 {item.desc}
               </p>
-              {/* <span className="text-gray-500 dark:text-gray-400 text-xs">
-                {item.time}
-              </span> */}
             </div>
           </div>
         ))}
       </div>
+
       <Button
-        color={"white"}
-        text={"See all notifications"}
-        borderRadius={"10px"}
-        size={"md"}
-        classes="w-full mt-5"
-        func={() => handleClosingClick("notification")}
-      />
+        text="See all notifications"
+        // color="bg-white"
+        color="text-gray-700"
+        borderRadius="rounded-lg"
+        classes="mt-5 border border-gray-300 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700" 
+        size={"md"}      />
     </div>
   );
 };

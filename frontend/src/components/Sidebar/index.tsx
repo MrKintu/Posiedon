@@ -12,8 +12,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SiShopware } from "react-icons/si";
 import { MdOutlineCancel } from "react-icons/md";
-import { TooltipComponent } from "@syncfusion/ej2-react-popups";
-import { links } from "public/data/dummy";
+import { links } from "public/data/navigationData";
 import { useStateContext } from "@/contexts/ContextProvider";
 
 interface LinkItem {
@@ -27,18 +26,17 @@ interface Category {
   links: LinkItem[];
 }
 
-const Sidebar: React.FC = () => {
-  const { themeColor, activeMenu, setActiveMenu, screenSize, toggleMenu } = useStateContext();
+const Sidebar = () => {
+  const { activeMenu, setActiveMenu, screenSize, themeColor, navButton } = useStateContext();
   const [mounted, setMounted] = useState(false);
-  const router = usePathname(); 
+  const pathname = usePathname();
 
-  // Hydration: Ensure component renders only on the client
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (!mounted) return; // Ensure this runs only after mounting
+    if (!mounted) return;
     const storedActiveMenu = localStorage.getItem("activeMenu");
     if (storedActiveMenu !== null) {
       setActiveMenu(JSON.parse(storedActiveMenu));
@@ -51,68 +49,86 @@ const Sidebar: React.FC = () => {
     }
   }, [activeMenu, mounted]);
 
-  // Close Sidebar on smaller screens or when manually closed
   const handleCloseSidebar = () => {
-    if (screenSize <= 900 || activeMenu) {
+    if ((screenSize !== undefined && screenSize <= 900) || navButton) {
       setActiveMenu(false);
     }
   };
 
-  const activeLink = "flex items-center gap-5 pl-4 pt-3 pb-2.5 rounded-lg text-md m-2 text-white";
-  const normalLink = "flex items-center gap-5 pl-4 pt-3 pb-2.5 rounded-lg text-md text-gray-700 dark:text-gray-200 dark:hover:text-black hover:bg-light-gray m-2";
+  if (!mounted) return null;
 
-  if (!mounted) return null;  // Avoid rendering before mounted
+  const activeLink = "flex items-center gap-5 pl-4 pt-3 pb-2.5 rounded-lg text-white text-md m-2 transition-colors duration-200";
+  const normalLink = "flex items-center gap-5 pl-4 pt-3 pb-2.5 rounded-lg text-md text-gray-700 dark:text-gray-200 dark:hover:text-black hover:bg-light-gray m-2 transition-colors duration-200";
+
+  const sidebarClasses = `
+    w-72 fixed sidebar
+    ${navButton ? 'top-0 h-screen' : 'top-16 h-[calc(100vh-64px)]'}
+    ${activeMenu ? 'left-0' : '-left-72'}
+    bg-white dark:bg-secondary-dark-bg
+    transition-all duration-300 ease-in-out
+    ${navButton ? 'z-[60]' : 'z-[10]'}
+    backdrop-blur-lg bg-opacity-95 dark:bg-opacity-95
+    border-r border-gray-200 dark:border-gray-700
+    shadow-lg
+  `;
+
+  const overlayClasses = `
+    fixed inset-0 bg-black/50 dark:bg-black/70
+    transition-opacity duration-300
+    ${navButton && activeMenu ? 'opacity-100 z-[50]' : 'opacity-0 pointer-events-none -z-10'}
+  `;
 
   return (
-    <div className={activeMenu ? "w-72 fixed top-0 left-0 h-full sidebar dark:bg-secondary-dark-bg bg-white z-50" : "hidden"}>
-      <div className="ml-3 h-screen md:overflow-hidden overflow-auto md:hover:overflow-auto pb-10">
-        {activeMenu && (
-          <>
-            <div className="flex justify-between items-center">
-              <button onClick={toggleMenu} className="items-center gap-3 ml-3 mt-4 flex text-xl font-extralight tracking-tight dark:text-white text-slate-900">
-                -X-
-              </button>
-              <Link
-                href="/"
-                onClick={handleCloseSidebar}
-                className="items-center gap-3 ml-3 mt-4 flex text-xl font-extralight tracking-tight dark:text-white text-slate-900"
-              >
-                <SiShopware /> <span>MAZU</span>
-              </Link>
+    <>
+      <div className={overlayClasses} onClick={handleCloseSidebar} />
+      
+      <div className={sidebarClasses}>
+        <div className="ml-3 h-screen md:overflow-hidden overflow-auto md:hover:overflow-auto pb-10">
+          {activeMenu && (
+            <>
+              <div className="flex justify-between items-center">
+                <Link
+                  href="/"
+                  onClick={handleCloseSidebar}
+                  className="items-center gap-3 ml-3 mt-4 flex text-xl font-extralight tracking-tight dark:text-white text-slate-900"
+                >
+                  <SiShopware /> <span>MAZU</span>
+                </Link>
 
-              <TooltipComponent content="Menu" position="BottomCenter">
                 <button
                   type="button"
                   onClick={handleCloseSidebar}
-                  className="text-xl rounded-full p-3 hover:bg-light-gray mt-4 block md:hidden"
+                  className="text-xl rounded-full p-3 hover:bg-light-gray mt-4 block"
+                  title="Menu"
                 >
                   <MdOutlineCancel />
                 </button>
-              </TooltipComponent>
-            </div>
-            <div className="mt-10">
-              {links.map((category: Category) => (
-                <div key={category.title}>
-                  <p className="text-gray-400 m-3 mt-4 uppercase">{category.title}</p>
-                  {category.links.map((link: LinkItem) => (
-                    <Link
-                      key={link.name}
-                      href={`/${link.path}`}
-                      onClick={handleCloseSidebar}
-                      className={`${router === `/${link.path}` ? activeLink : normalLink}`}
-                      style={router === `/${link.path}` ? { backgroundColor: themeColor } : {}}
-                    >
-                      {link.icon}
-                      <span className="capitalize">{link.name}</span>
-                    </Link>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </>
-        )}
+              </div>
+              <div className="mt-10">
+                {links.map((category: Category) => (
+                  <div key={category.title}>
+                    <p className="text-gray-400 m-3 mt-4 uppercase">{category.title}</p>
+                    {category.links.map((link: LinkItem) => (
+                      <Link
+                        key={link.name}
+                        href={`/${link.path}`}
+                        onClick={handleCloseSidebar}
+                        className={pathname === `/${link.path}` ? activeLink : normalLink}
+                        style={pathname === `/${link.path}` ? { backgroundColor: themeColor } : {}}
+                        title={link.name}
+                      >
+                        {link.icon}
+                        <span className="capitalize">{link.name}</span>
+                      </Link>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

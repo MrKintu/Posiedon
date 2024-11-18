@@ -10,8 +10,9 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useStateContext } from "@/contexts/ContextProvider";
-import { chatData } from "public/data/dummy";
+import { chatData } from "public/data/uiData";
 import { SubHeading, Button } from "@/components";
+import { CgProfile } from "react-icons/cg";
 
 const Chat: React.FC = () => {
   const { handleClosingClick } = useStateContext();
@@ -34,23 +35,34 @@ const Chat: React.FC = () => {
         {chatData.map((item, index) => (
           <div
             key={index}
-            className="flex gap-5 items-center p-3 border-b-1 border-color dark:border-gray-600 cursor-pointer"
+            className="flex items-center gap-4 border-b border-gray-200 dark:border-gray-600 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
           >
-            <Image
-              src={item.image}
-              alt={item.message}
-              className="rounded-full w-10 h-10"
-            />
+            <div className="relative w-10 h-10">
+              {item.image ? (
+                <Image
+                  src={item.image}
+                  alt={item.message}
+                  fill
+                  className="rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                  <CgProfile className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+                </div>
+              )}
+            </div>
             <div className="flex-1">
-              <h3 className="font-semibold dark:text-gray-200">
+              <p className="font-semibold dark:text-gray-200">
                 {item.message}
-              </h3>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">
-                {item.desc}
               </p>
-              <span className="text-gray-500 dark:text-gray-400 text-xs">
-                {item.time}
-              </span>
+              <div className="flex items-center justify-between">
+                <p className="text-gray-500 dark:text-gray-400 text-sm">
+                  {item.time}
+                </p>
+                {!item.isRead && (
+                  <span className="w-2 h-2 bg-blue-600 rounded-full" />
+                )}
+              </div>
             </div>
           </div>
         ))}
