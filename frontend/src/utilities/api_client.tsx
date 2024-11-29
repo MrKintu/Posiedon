@@ -6,6 +6,7 @@
  */
 
 import axios, { AxiosError, AxiosResponse } from 'axios';
+import { secureStorage } from '@/utilities/auth';
 
 interface ApiResponse {
   [key: string]: any;
@@ -18,7 +19,7 @@ if (!API_BASE_URL) {
 
 // Add auth token to requests if available
 const getAuthHeader = () => {
-  const token = localStorage.getItem('access_token');
+  const token = secureStorage.getItem('access_token');
   return token ? { 'Authorization': `Bearer ${token}` } : {};
 };
 
@@ -76,11 +77,18 @@ const ApiClient = {
           data: error.response?.data,
           headers: error.response?.headers
         });
+        
+        // Handle 401 Unauthorized
+        if (error.response?.status === 401) {
+          // Clear session and redirect to login
+          secureStorage.clear();
+          window.location.replace('/sign-in');
+        }
       }
       const message = error instanceof AxiosError && error.response
         ? error.response.data
         : "An error occurred while posting data.";
-      return { error: message } as T;
+      throw message; // Throw instead of returning to properly handle errors
     }
   },
 

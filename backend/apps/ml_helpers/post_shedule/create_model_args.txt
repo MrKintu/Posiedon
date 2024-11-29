@@ -1,0 +1,27 @@
+Post Schedule Create Model Arguments
+=====================================
+
+create_prophet_model:
+------------------
+- data: DataFrame - Preprocessed DataFrame
+- params: Optional[Dict[str, Any]] - Optional dictionary of Prophet parameters
+
+create_lstm_model:
+---------------
+- input_shape: Tuple[int, int] - Shape of input data (sequence_length, n_features)
+- dropout_rate: float - Dropout rate for regularization (default: 0.2)
+
+create_hybrid_models_batch:
+------------------------
+- channels: Optional[List[str]] - List of channels to create models for
+- data_path: str - Path to the data file (default: 'data.csv')
+
+process_channel:
+-------------
+- channel: str - Channel name
+- data_path: str - Path to data file
+- model_dir: str - Directory to save models (default: backend/ml_models)
+
+Command Line Usage:
+----------------
+python create_model.py [--data_path DATA_PATH] [--channels CHANNEL1 CHANNEL2 ...]

@@ -1,0 +1,22 @@
+Sentiment Analysis Create Model Arguments
+====================================
+
+create_models:
+------------
+No direct arguments required. The function uses default configurations internally.
+
+Model Types:
+----------
+1. Sentiment Analysis Model:
+   - Uses DistilBERT base uncased model
+   - 3 labels: positive (0), negative (1), neutral (2)
+
+2. Engagement Model:
+   - Uses Random Forest Classifier
+   - 3 labels: low (0), medium (1), high (2)
+
+Command Line Usage:
+----------------
+python create_model.py
+
+Note: The model configurations are set internally in the code. To modify parameters, you'll need to edit the create_models() function directly.

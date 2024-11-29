@@ -12,8 +12,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SiShopware } from "react-icons/si";
 import { MdOutlineCancel } from "react-icons/md";
-import { links } from "public/data/navigationData";
+import { getFilteredLinks } from "public/data/navigationData";
 import { useStateContext } from "@/contexts/ContextProvider";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 interface LinkItem {
   name: string;
@@ -28,6 +29,7 @@ interface Category {
 
 const Sidebar = () => {
   const { activeMenu, setActiveMenu, screenSize, themeColor, navButton } = useStateContext();
+  const { userData } = useAuthContext();
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
 
@@ -78,6 +80,9 @@ const Sidebar = () => {
     ${navButton && activeMenu ? 'opacity-100 z-[50]' : 'opacity-0 pointer-events-none -z-10'}
   `;
 
+  // Get filtered navigation links based on user's staff status
+  const filteredLinks = getFilteredLinks(userData?.is_staff || false);
+
   return (
     <>
       <div className={overlayClasses} onClick={handleCloseSidebar} />
@@ -105,10 +110,10 @@ const Sidebar = () => {
                 </button>
               </div>
               <div className="mt-10">
-                {links.map((category: Category) => (
+                {filteredLinks.map((category) => (
                   <div key={category.title}>
                     <p className="text-gray-400 m-3 mt-4 uppercase">{category.title}</p>
-                    {category.links.map((link: LinkItem) => (
+                    {category.links.map((link) => (
                       <Link
                         key={link.name}
                         href={`/${link.path}`}

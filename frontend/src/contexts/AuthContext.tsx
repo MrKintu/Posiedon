@@ -7,7 +7,7 @@
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from "react";
 import ApiClient from '@/utilities/api_client';
-import { secureStorage, isTokenExpired } from '@/utils/auth';
+import { secureStorage, isTokenExpired } from '@/utilities/auth';
 
 interface UserData {
   id?: number;
@@ -73,6 +73,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch (error) {
       console.error('Logout error:', error);
+      // Continue with local logout even if the API call fails
     } finally {
       // Clear secure storage
       secureStorage.clear();

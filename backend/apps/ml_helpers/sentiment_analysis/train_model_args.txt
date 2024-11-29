@@ -1,0 +1,32 @@
+Sentiment Analysis Train Model Arguments
+===================================
+
+train_model_continuous:
+--------------------
+- model: Model - The model to train (either loaded or newly initialized)
+- data: DataFrame - Training data
+- batch_size: int - Size of training batches
+- num_iterations: int - Number of training iterations
+- tokenizer: Tokenizer - Tokenizer for text processing
+- model_save_path: str - Path to save model
+- model_type: str - Type of model ('sentiment' or 'engagement')
+
+train_models:
+-----------
+- model_type: str - Type of model to train ('sentiment', 'engagement', or 'both') (default: 'both')
+- continuous: bool - Whether to use continuous learning (default: False)
+
+Default Training Parameters:
+-------------------------
+Sentiment Analysis:
+- batch_size: 32
+- num_iterations: 5
+- max_length: 128
+
+Engagement Prediction:
+- batch_size: 300
+- num_iterations: 5
+
+Command Line Usage:
+----------------
+python train_model.py [--model_type {sentiment,engagement,both}] [--continuous]

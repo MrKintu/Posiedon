@@ -2,7 +2,16 @@
 media/
 logs/
 static/
+mlruns/
+tmp_trainer/
+tmp/
+trained_model_batches/
 */migrations/0*.py
+apps/ml_helpers/*/logs/
+apps/ml_helpers/*/tmp/
+apps/ml_helpers/*/tmp_trainer/
+ml_models/*/model.safetensors
+ml_models/*/initial_model/model.safetensors
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

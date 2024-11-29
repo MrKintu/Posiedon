@@ -31,7 +31,18 @@ import { IoMdContacts } from "react-icons/io";
 import { RiContactsLine, RiStockLine } from "react-icons/ri";
 import { GiLouvrePyramid } from "react-icons/gi";
 
-export const links = [
+interface NavLink {
+    name: string;
+    path: string;
+    icon: React.ReactElement;
+}
+
+interface NavSection {
+    title: string;
+    links: NavLink[];
+}
+
+export const links: NavSection[] = [
     {
         title: "Dashboard",
         links: [
@@ -223,6 +234,18 @@ export const links = [
         ],
     },
 ];
+
+// Function to filter navigation links based on user's staff status
+export const getFilteredLinks = (isStaff: boolean): NavSection[] => {
+    return links.filter(section => {
+        // Always include non-staff sections
+        if (section.title !== 'Staff') {
+            return true;
+        }
+        // Only include staff section if user is staff
+        return isStaff;
+    });
+};
 
 export const themeColors = [
     {

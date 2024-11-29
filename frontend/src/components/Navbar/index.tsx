@@ -23,6 +23,7 @@ import Chat from "../Chat";
 import Notification from "../Notification";
 import UserProfile from "../UserProfile";
 import Cart from "../Cart";
+import ThemeSettings from "../ThemeSettings";
 import avatar from "public/data/avatar.jpg";
 
 const menuData = [
@@ -171,8 +172,9 @@ const Navbar = () => {
               </button>
             </Link>
           )}
-
-          <ThemeToggler />
+          {isLoggedIn ? (
+            <ThemeToggler />
+          ) : null}
         </div>
       </div>
 

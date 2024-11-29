@@ -171,6 +171,8 @@ LOGGING = {
     },
 }
 
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
+
 
 # Security Settings
 SECURE_BROWSER_XSS_FILTER = True

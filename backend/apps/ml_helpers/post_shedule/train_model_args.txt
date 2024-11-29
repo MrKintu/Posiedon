@@ -1,0 +1,24 @@
+Post Schedule Train Model Arguments
+=================================
+
+generate_synthetic_data:
+---------------------
+- num_records: int - Number of records to generate per channel (default: 1000)
+- start_date: str - Start date for the time series (default: '2023-01-01')
+- channels: List[str] - List of social media channels (default: ['Facebook', 'Instagram', 'Twitter', 'Pinterest'])
+
+train_channel_model_continuous:
+----------------------------
+- channel: str - Channel name
+- data: DataFrame - Training data DataFrame
+- model_dir: str - Directory to save models
+- batch_size: int - Number of samples per iteration (default: 1000)
+- num_iterations: int - Number of training iterations (default: 10)
+- sequence_length: int - Sequence length for LSTM (default: 30)
+- epochs_per_iteration: int - Number of epochs per iteration (default: 5)
+- test_size: float - Proportion of data to use for testing (default: 0.2)
+- continuous: bool - Whether to use continuous learning (default: True)
+
+Command Line Usage:
+----------------
+python train_model.py [--model_dir MODEL_DIR] [--batch_size BATCH_SIZE] [--num_iterations NUM_ITERATIONS] [--continuous]

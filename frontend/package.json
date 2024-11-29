@@ -1,5 +1,7 @@
 {
-  "name": "mazu-marketing",
+  "name": "posiedon",
+  "author": "Declan Trevor Kintu",
+  "license": "Apache-2.0 AND LGPL-3.0-or-later AND MIT",
   "version": "2.0.0",
   "private": true,
   "scripts": {
@@ -9,9 +11,9 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@builder.io/dev-tools": "^1.1.3",
-    "@builder.io/react": "^5.0.1",
-    "@builder.io/sdk": "^3.0.1",
+    "@builder.io/dev-tools": "^1.1.36",
+    "@builder.io/react": "^7.0.0",
+    "@builder.io/sdk": "^5.0.0",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@mui/material": "^6.1.2",

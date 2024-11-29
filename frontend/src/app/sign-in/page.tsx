@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ApiClient from "@/utilities/api_client";
 import { useAuthContext } from "@/contexts/AuthContext";
-import { secureStorage, sanitizeInput, isTokenExpired, rateLimit } from "@/utils/auth";
+import { secureStorage, sanitizeInput, isTokenExpired, rateLimit } from "@/utilities/auth";
 
 const Signin = () => {
   const [isClient, setIsClient] = useState(false);

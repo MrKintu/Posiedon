@@ -12,6 +12,7 @@ import React, { createContext, useContext, useState, useEffect, useMemo, ReactNo
 interface StateContextType {
   activeMenu: boolean;
   setActiveMenu: React.Dispatch<React.SetStateAction<boolean>>;
+  toggleMenu: () => void;
   isClicked: typeof initialState;
   setIsClicked: React.Dispatch<React.SetStateAction<typeof initialState>>;
   handleClick: (clicked: keyof typeof initialState) => void;
@@ -26,6 +27,8 @@ interface StateContextType {
   setColor: (color: string) => void;
   activeThemeSettings: boolean;
   setActiveThemeSettings: React.Dispatch<React.SetStateAction<boolean>>;
+  navButton: boolean;
+  setNavButton: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface ContextProviderProps {
@@ -49,10 +52,10 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
     return false;
   });
 
-  const [isClicked, setIsClicked] = useState(initialState);
   const [screenSize, setScreenSize] = useState<number | undefined>(undefined);
-  const [themeColor, setThemeColor] = useState("#FF5C8E");
-  const [currentMode, setCurrentMode] = useState("light");
+  const [currentMode, setCurrentMode] = useState('Light');
+  const [themeColor, setThemeColor] = useState('#03C9D7');
+  const [isClicked, setIsClicked] = useState(initialState);
   const [activeThemeSettings, setActiveThemeSettings] = useState(false);
   const [navButton, setNavButton] = useState(false);
 
@@ -106,16 +109,17 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
   };
 
   const toggleMenu = () => {
-    setActiveMenu((prev: any) => {
-      const newValue = !prev;
-      localStorage.setItem("activeMenu", JSON.stringify(newValue));
-      return newValue;
-    });
+    const newActiveMenu = !activeMenu;
+    setActiveMenu(newActiveMenu);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem("activeMenu", JSON.stringify(newActiveMenu));
+    }
   };
 
   const contextValue = useMemo(() => ({
     activeMenu,
     setActiveMenu,
+    toggleMenu,
     isClicked,
     setIsClicked,
     handleClick,
@@ -130,7 +134,6 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
     setColor,
     activeThemeSettings,
     setActiveThemeSettings,
-    toggleMenu,
     navButton,
     setNavButton,
   }), [activeMenu, isClicked, screenSize, currentMode, themeColor, activeThemeSettings, navButton]);

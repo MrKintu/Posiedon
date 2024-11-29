@@ -20,12 +20,10 @@ const ThemeToggler: React.FC = () => {
 
   useEffect(() => {
     setIsClient(true);
-    console.log('[ThemeToggler] Initial theme:', theme);
   }, [theme]);
 
   const handleThemeToggle = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
-    console.log('[ThemeToggler] Toggling theme from', theme, 'to', newTheme);
     setTheme(newTheme);
   };
 

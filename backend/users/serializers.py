@@ -17,7 +17,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Staff, Customer
 
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 # Generate User ID
 def new_ID(is_staff: bool) -> str:
@@ -74,15 +74,15 @@ class UserSerializer(serializers.ModelSerializer):
         
         # Check if email already exists
         if User.objects.filter(email=email).exists():
-            logger.warning("Attempted to create a user with an existing email: %s", email)
+            _logger.warning("Attempted to create a user with an existing email: %s", email)
             raise serializers.ValidationError({"email": "A user with this email already exists."})
         
-        logger.debug("Validated data: %s", validated_data)
+        _logger.debug("Validated data: %s", validated_data)
         customer_data = validated_data.pop('customer')
         
         is_staff = validated_data.get('is_staff')
         user_id = new_ID(is_staff)
-        logger.debug("Creating user with user_id: %s", user_id)
+        _logger.debug("Creating user with user_id: %s", user_id)
         
         # Create user
         user = User.objects.create_user(
@@ -93,11 +93,11 @@ class UserSerializer(serializers.ModelSerializer):
             last_name=validated_data.get('last_name'),
             is_staff=is_staff
         )
-        logger.info("User created: %s", user)
+        _logger.info("User created: %s", user)
 
         if is_staff:
             # Create staff and associate customers if provided
-            logger.debug("Creating staff for user: %s", user)
+            _logger.debug("Creating staff for user: %s", user)
             staff = Staff.objects.create(
                 user=user,
                 staff_id=user_id,
@@ -106,24 +106,24 @@ class UserSerializer(serializers.ModelSerializer):
                 phone=validated_data.get('phone'),
                 is_admin=validated_data.get('is_admin')
             )
-            logger.info("Staff created: %s", staff)
+            _logger.info("Staff created: %s", staff)
 
             if 'customers' in validated_data:
                 for single in validated_data.get('customers'):
                     customer = get_object_or_404(Customer, customer_id=single)
                     staff.customers.add(customer)
-                    logger.info("Customer added to staff: %s", customer)
+                    _logger.info("Customer added to staff: %s", customer)
         else:
             # Create customer
-            logger.debug("Creating customer for user: %s", user)
+            _logger.debug("Creating customer for user: %s", user)
             customer = Customer.objects.create(
                 user=user,
                 customer_id=user_id,
                 **customer_data
             )
-            logger.info("Customer created: %s", customer)
+            _logger.info("Customer created: %s", customer)
 
-        logger.debug("Returning user: %s", user)
+        _logger.debug("Returning user: %s", user)
         return user
 
 
@@ -132,32 +132,32 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):
-        logger.info("Validating login credentials for email: %s", data['email'])
+        _logger.info("Validating login credentials for email: %s", data['email'])
         
         # Retrieve the user by email
         try:
             user = User.objects.get(email=data['email'])
-            logger.info("Found user with email: %s", data['email'])
+            _logger.info("Found user with email: %s", data['email'])
         except User.DoesNotExist:
-            logger.warning("Login attempt with non-existing email: %s", data['email'])
+            _logger.warning("Login attempt with non-existing email: %s", data['email'])
             raise serializers.ValidationError({"detail": "Invalid email or password"})
         
         # Authenticate with username and password
         authenticated_user = authenticate(username=user.username, password=data['password'])
         
         if authenticated_user and authenticated_user.is_active:
-            logger.info("User %s authenticated successfully", authenticated_user.username)
+            _logger.info("User %s authenticated successfully", authenticated_user.username)
             self.context['user'] = authenticated_user
             return {
                 'user': authenticated_user,
                 'email': data['email']
             }
         
-        logger.warning("Invalid password for email: %s", data['email'])
+        _logger.warning("Invalid password for email: %s", data['email'])
         raise serializers.ValidationError({"detail": "Invalid email or password"})
 
     def create(self, validated_data):
-        logger.info("Creating JWT tokens for user.")
+        _logger.info("Creating JWT tokens for user.")
 
         # Retrieve the authenticated user from context
         user = self.context['user']
@@ -166,7 +166,7 @@ class LoginSerializer(serializers.Serializer):
         # Get user data using serializer
         user_data = UserSerializer(user).data
         
-        logger.info("Tokens generated for user: %s", user.username)
+        _logger.info("Tokens generated for user: %s", user.username)
         
         return {
             'refresh': str(refresh),

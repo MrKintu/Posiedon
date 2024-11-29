@@ -6,7 +6,7 @@
  */
 
 import { builder } from "@builder.io/sdk";
-import { RenderContent } from "@/components/builder";
+import { RenderBuilderContent } from "@/components/builder";
 import { Metadata } from "next";
 
 // Builder Public API Key set in .env file
@@ -32,7 +32,7 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <div>
-      <RenderContent content={content} />
+      <RenderBuilderContent content={content} />
     </div>
   );
 }
@@ -61,7 +61,16 @@ export async function generateStaticParams() {
     options: { noTargeting: true },
   });
 
-  return pages.map((page) => ({
-    page: page.data?.url?.split('/').filter(Boolean) || [],
-  }));
+  console.log('Pages from Builder:', JSON.stringify(pages, null, 2));
+
+  return pages.map((page) => {
+    console.log('Processing page:', JSON.stringify(page, null, 2));
+    if (!page.data?.url || typeof page.data.url !== 'string') {
+      console.log('Warning: page.data.url is not a string:', page.data?.url);
+      return { page: [] };
+    }
+    return {
+      page: page.data.url.split('/').filter(Boolean) || [],
+    };
+  });
 }
